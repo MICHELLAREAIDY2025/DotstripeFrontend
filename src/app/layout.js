@@ -1,20 +1,26 @@
-import "./globals.css"
-import Navbar from "@/app/Components/navbar"
-import Footer from "@/app/Components/footer"
+"use client"; // Required for client components
 
-export const metadata = {
-  title: "Dot Stripe - Your Partner to Excellence",
-  description: "Dot Stripe assists businesses profit on the growth and potential of information technology.",
-}
+import "@/styles/globals.css";
+import { Belleza } from "next/font/google";
+import { AuthProvider } from "@/context/AuthContext"; // Ensure correct path
+import { CartProvider } from "../context/Cartcontext";
+import { Suspense } from "react"; // Import Suspense from React
+
+const belleza = Belleza({ subsets: ["latin"], weight: "400" });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-      </body>
-    </html>
-  )
+    <AuthProvider>
+      <CartProvider>
+        <html lang="en">
+          <body className={belleza.className}>
+            {/* Wrap children inside Suspense */}
+            <Suspense fallback={<div>Loading...</div>}>
+              {children}
+            </Suspense>
+          </body>
+        </html>
+      </CartProvider>
+    </AuthProvider>
+  );
 }

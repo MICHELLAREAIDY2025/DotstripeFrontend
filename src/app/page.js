@@ -1,5 +1,5 @@
 import Link from "next/link"
-import Hero from "@/components/hero"
+import Hero from "@/app/Components/hero"
 
 export default function Home() {
   return (

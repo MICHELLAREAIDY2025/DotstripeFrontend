@@ -1,149 +1,120 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { login, register } from "@/lib/api"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
 
-export default function Login() {
-  const [isLogin, setIsLogin] = useState(true)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(null)
-  const router = useRouter()
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
+const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth();
+  const router = useRouter();
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
-
+    e.preventDefault();
     try {
-      if (isLogin) {
-        await login(formData.email, formData.password)
-      } else {
-        await register(formData)
+      const userData = await login({ email, password });
+  
+      if (userData) {
+        toast.success("Login successful");
+  
+        // ✅ Store role in localStorage for access control
+        localStorage.setItem("role", userData.role);
+  
+        // Redirect based on role
+        if (userData.role === "admin") {
+          router.push("/admin"); // Redirect admins to the admin panel
+        } else {
+          router.push("/"); // Redirect non-admins to home page
+        }
       }
-      router.push("/")
-    } catch (error) {
-      console.error("Authentication error:", error)
-      setError(error.response?.data?.message || "Authentication failed")
-    } finally {
-      setIsSubmitting(false)
+    } catch (err) {
+      toast.error("Invalid email or password");
+      setError("Login failed. Please check your credentials and try again.");
     }
-  }
+  };
+  
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white bg-opacity-10 p-8 rounded-xl shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold">
-            {isLogin ? "Sign in to your account" : "Create a new account"}
-          </h2>
-        </div>
+    <div className="flex h-screen">
+      <ToastContainer
+        position="top-left"
+        autoClose={4001}
+        limit={4}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      {/* Left Side - Image Section */}
+      <div className="w-1/2 flex items-center justify-center bg-[#4A8C8C]">
+        <img
+          src="https://i.ibb.co/k6xkcTs5/image-15.png"
+          alt="Login Illustration"
+          className="max-w-full h-full"
+        />
+      </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-500 bg-opacity-20 border border-red-400 text-white px-4 py-3 rounded">{error}</div>
-          )}
+      {/* Right Side - Login Form */}
+      <div className="w-1/2 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+          <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
-          {!isLogin && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="sr-only">
-                  First Name
-                </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="lastName" className="sr-only">
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
-              </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1" htmlFor="email">
+                Email:
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="border rounded w-full p-2"
+              />
             </div>
-          )}
 
-          <div>
-            <label htmlFor="email" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Email address"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1" htmlFor="password">
+                Password:
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="border rounded w-full p-2"
+              />
+            </div>
 
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete={isLogin ? "current-password" : "new-password"}
-              required
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="bg-[#4A8C8C] text-white py-2 px-4 rounded w-full hover:bg-[#3a7070] transition duration-300"
             >
-              {isSubmitting ? "Processing..." : isLogin ? "Sign in" : "Sign up"}
+              Login
             </button>
-          </div>
-        </form>
+          </form>
 
-        <div className="text-center mt-4">
-          <button onClick={() => setIsLogin(!isLogin)} className="text-blue-300 hover:text-blue-200">
-            {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
-          </button>
+          <p className="text-sm text-gray-600 text-center mt-4">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-blue-500 hover:underline font-medium">
+              Register here
+            </Link>
+          </p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default LoginPage;

@@ -1,6 +1,6 @@
 import "./globals.css"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
+import Navbar from "@/app/Components/navbar"
+import Footer from "@/app/Components/footer"
 
 export const metadata = {
   title: "Dot Stripe - Your Partner to Excellence",

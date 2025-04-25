@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/context/Cartcontext";
 import Link from "next/link";
 import ImageComponent from "./imageComponent";
 import CartPopup from "./CartPopup";

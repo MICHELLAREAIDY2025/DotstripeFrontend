@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/Cartcontext";
 import Link from "next/link";
-import ImageComponent from "./imageComponent";
+import Image from "next/image";
+import { ShoppingCart, UserCircle, LogIn } from "lucide-react";
 import CartPopup from "./CartPopup";
-import { ShoppingCart, UserCircle } from "lucide-react";
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -32,57 +32,38 @@ const Header = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <header className="top-0 z-50 w-full bg-white shadow-md fixed px-4 md:px-10 py-4 md:py-6">
-      <div className="flex items-center justify-between w-full">
-        {/* Left: Logo + Burger (mobile only) */}
-        <div className="flex items-center gap-3">
+    <header className="top-0 z-50 w-full bg-[#0A1929] shadow-md fixed px-0">
+      <div className="max-w-7xl mx-auto flex items-center justify-between w-full px-4 md:px-12 py-4 md:py-6">
+        {/* Logo */}
+        <div className="flex items-center">
           <Link href="/">
-            <ImageComponent
-              src="https://i.ibb.co/BXqy2R2/michella-logo-4x.png"
-              alt="Logo"
-              width={60}
+            <Image
+              src="/images/DotstripeLogo.png"
+              alt="Dot Stripe Logo"
+              width={120}
               height={60}
-              className="cursor-pointer"
+              className="h-16 w-auto"
+              priority
             />
           </Link>
-
-          {/* Burger Icon */}
-          <button
-            className="md:hidden flex items-center justify-center w-8 h-8 "
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </button>
         </div>
-
         {/* Center: Desktop Navigation */}
-        <nav className="hidden md:flex space-x-8 text-lg font-semibold absolute left-1/2 transform -translate-x-1/2">
-          <Link href="/">Home</Link>
-          <Link href="/about">About</Link>
-          <Link href="/totes">Totes</Link>
-          <Link href="/contact">Contact</Link>
+        <nav className="hidden md:flex text-lg font-semibold mx-20 text-white space-x-20">
+          <Link href="/what-we-do" className="hover:text-[#3B6EA5] transition-colors">what we do</Link>
+          <Link href="/what-we-think" className="hover:text-[#3B6EA5] transition-colors">what we think</Link>
+          <Link href="/who-we-are" className="hover:text-[#3B6EA5] transition-colors">who we are</Link>
         </nav>
-
         {/* Right: Icons */}
-        <div className="flex space-x-4 items-center relative">
+        <div className="flex space-x-6 items-center relative">
           {!user ? (
-            <Link href="/login" aria-label="Login">
-              <UserCircle size={28} className="text-gray-700 hover:text-[#4A8C8C] transition-colors" />
+            <Link href="/login" aria-label="Login" className="flex items-center">
+              <LogIn className="h-5 w-5 mr-1 text-white hover:text-[#3B6EA5] transition-colors" />
+              <span className="text-white hover:text-[#3B6EA5] transition-colors">Login</span>
             </Link>
           ) : (
             <div className="relative flex flex-col items-center" ref={dropdownRef}>
               <button onClick={toggleDropdown} className="focus:outline-none">
-                <UserCircle size={28} className="text-gray-700 hover:text-[#4A8C8C] transition-colors" />
+                <UserCircle size={28} className="text-white hover:text-[#3B6EA5] transition-colors" />
               </button>
               {isDropdownOpen && (
                 <div className="absolute top-[110%] right-0 w-48 bg-white border rounded shadow-md z-50">
@@ -101,42 +82,35 @@ const Header = () => {
               )}
             </div>
           )}
-
-          <button
-            onClick={toggleCart}
-            className="relative p-2 text-gray-700 hover:text-[#4A8C8C] transition-colors"
-            aria-label="Open cart"
-          >
-            <ShoppingCart size={24} />
+          <Link href="/cart" className="relative text-white hover:text-[#3B6EA5] transition-colors">
+            <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#4A8C8C] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-[#3B6EA5] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {cartCount}
               </span>
             )}
-          </button>
+          </Link>
         </div>
       </div>
-
       {/* Mobile Navigation Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden mt-2 bg-white shadow-md rounded p-4">
-          <nav className="flex flex-col space-y-4">
-            <Link href="/" onClick={() => setIsMenuOpen(false)} className="block py-1">
-              Home
+        <div className="md:hidden mt-2 bg-[#0A1929] shadow-md rounded p-4">
+          <nav className="flex flex-col space-y-4 text-white">
+            <Link href="/what-we-do" onClick={() => setIsMenuOpen(false)} className="block py-1 hover:text-[#3B6EA5]">
+              what we do
             </Link>
-            <Link href="/about" onClick={() => setIsMenuOpen(false)} className="block py-1">
-              About
+            <Link href="/what-we-think" onClick={() => setIsMenuOpen(false)} className="block py-1 hover:text-[#3B6EA5]">
+              what we think
             </Link>
-            <Link href="/totes" onClick={() => setIsMenuOpen(false)} className="block py-1">
-              Totes
+            <Link href="/who-we-are" onClick={() => setIsMenuOpen(false)} className="block py-1 hover:text-[#3B6EA5]">
+              who we are
             </Link>
-            <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="block py-1">
-              Contact
+            <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block py-1 hover:text-[#3B6EA5]">
+              Login
             </Link>
           </nav>
         </div>
       )}
-
       <CartPopup isOpen={isCartOpen} onClose={toggleCart} />
     </header>
   );

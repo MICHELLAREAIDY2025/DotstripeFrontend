@@ -30,7 +30,7 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-16">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-16">
-            ...YOUR PATHWAY
+            ...YOUR PATHWAY 
             <br />
             TO TECH EXCELLENCE...
           </h1>

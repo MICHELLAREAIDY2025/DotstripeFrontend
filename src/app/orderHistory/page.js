@@ -18,7 +18,7 @@ const OrdersHistory = () => {
   // Fetch Orders for Logged-in User
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders/my-orders`, { withCredentials: true });
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/my-orders`, { withCredentials: true });
       console.log("Orders Fetched:", response.data);
       setOrders(response.data);
       setFilteredOrders(response.data); // Show all orders 
@@ -59,12 +59,12 @@ const OrdersHistory = () => {
   const fetchOrderItems = async () => {
     try {
       const itemPromises = orders.map((order) =>
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders/${order.id}/items`, { withCredentials: true })
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/${order.id}/items`, { withCredentials: true })
       );
       const itemResponses = await Promise.all(itemPromises);
       const allItems = itemResponses.flatMap((res) => res.data);
       console.log("Order Items Fetched:", allItems);
-  
+
       const processedItems = allItems.map(item => {
         if (item.Product) {
           return {
@@ -95,7 +95,7 @@ const OrdersHistory = () => {
     if (orderItems.length === 0) return; 
   
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products/`);
       console.log("Products Fetched:", response.data); //  Debugging Log
       const productMap = response.data.reduce((acc, product) => {
         acc[product.id] = product;

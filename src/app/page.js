@@ -1,7 +1,7 @@
 "use client";
 
 import Head from "next/head";
-import Header from "@/app/Components/header";
+//import Header from "@/app/Components/header";
 import { useAuth } from '@/context/AuthContext';
 import Footer from "@/app/Components/footer";
 import axios from "axios";

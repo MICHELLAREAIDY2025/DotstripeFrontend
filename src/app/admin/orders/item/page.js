@@ -92,7 +92,7 @@ const OrderItemsPage = () => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders/item/${editItemData.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/orders/item/${editItemData.id}`,
         { quantity: parseInt(editItemData.quantity, 10) },
         { withCredentials: true }
       );
@@ -126,7 +126,7 @@ const OrderItemsPage = () => {
           onClick: async () => {
             try {
               const response = await axios.delete(
-                `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/item/${orderItemId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${orderId}/item/${orderItemId}`,
                 { withCredentials: true }
               );
 

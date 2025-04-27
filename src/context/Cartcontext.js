@@ -34,7 +34,7 @@ export function CartProvider({ children }) {
     }
     try {
       setLoading(true)
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
         withCredentials: true,
       })
 
@@ -86,7 +86,7 @@ export function CartProvider({ children }) {
           setCartItems((prevItems) => [...prevItems, { product_id: productId, quantity }])
         }
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart`,
         {
           product_id: productId,
           quantity,
@@ -123,7 +123,7 @@ export function CartProvider({ children }) {
           )
         }
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`,
         {
           quantity,
         },
@@ -154,7 +154,7 @@ export function CartProvider({ children }) {
          // Update local cart items for immediate feedback
          setCartItems((prevItems) => prevItems.filter((item) => item.product_id !== productId))
        }
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`, {
         withCredentials: true,
       })
 
@@ -173,7 +173,7 @@ export function CartProvider({ children }) {
     try {
       // Try to use a dedicated clear cart endpoint if it exists
       try {
-        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
           withCredentials: true,
         })
 
@@ -188,7 +188,7 @@ export function CartProvider({ children }) {
         try {
           const updatePromises = cartItems.map((item) =>
             axios.put(
-              `${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${item.product_id}`,
               { quantity: 0 },
               { withCredentials: true },
             ),
@@ -231,7 +231,7 @@ export function CartProvider({ children }) {
       // This is optional - implement if you have an orders endpoint
       try {
         // If you have an orders API endpoint, use it
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, { items: cartItems }, { withCredentials: true })
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, { items: cartItems }, { withCredentials: true })
       } catch (orderErr) {
         console.log("No orders endpoint available or order creation failed:", orderErr)
         // Continue with checkout even if order creation fails

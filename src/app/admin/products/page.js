@@ -36,7 +36,7 @@ export default function AdminProductsPage() {
   const formRef = useRef(null);
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
         withCredentials: true,
       });
       setProducts(data);
@@ -47,7 +47,7 @@ export default function AdminProductsPage() {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
         withCredentials: true,
       });
       setCategories(data);
@@ -86,7 +86,7 @@ export default function AdminProductsPage() {
         }
       });
 
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/products`, formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -113,7 +113,7 @@ export default function AdminProductsPage() {
         }
       });
 
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/products/${editProductId}`, formData, {
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${editProductId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -132,7 +132,7 @@ export default function AdminProductsPage() {
 
   const handleDeleteProduct = async (productId) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`, {
         withCredentials: true,
       });
   

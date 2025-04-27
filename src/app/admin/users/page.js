@@ -66,7 +66,7 @@ const UsersPage = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/users`, { withCredentials: true });
+      const res = await axios.get(`${API_URL}/api/users`, { withCredentials: true });
       setUsers(res.data.users || []);
     } catch (error) {
       toast.error("Error fetching users.");
@@ -88,7 +88,7 @@ const UsersPage = () => {
     }
 
     try {
-      await axios.post(`${API_URL}/users/register`, newUser, { withCredentials: true });
+      await axios.post(`${API_URL}/api/users/register`, newUser, { withCredentials: true });
       fetchUsers();
       resetForm();
       toast.success("User added successfully!");
@@ -110,7 +110,7 @@ const UsersPage = () => {
           label: "Yes",
           onClick: async () => {
             try {
-              await axios.delete(`${API_URL}/users/${userId}`, {
+              await axios.delete(`${API_URL}/api/users/${userId}`, {
                 withCredentials: true,
               });
               setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));

@@ -29,7 +29,7 @@ const DashboardPage = () => {
 
   const fetchOrders = async () => {
     try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
             withCredentials: true,
         });
 

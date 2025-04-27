@@ -26,10 +26,10 @@ export default function CartPopup({ isOpen, onClose }) {
 
       try {
         setLoading(true)
-        console.log("Fetching cart from:", `${process.env.NEXT_PUBLIC_API_URL}/cart`)
+        console.log("Fetching cart from:", `${process.env.NEXT_PUBLIC_API_URL}/api/cart`)
 
         // First, get the basic cart items
-        const cartResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+        const cartResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/cart`, {
           withCredentials: true,
         })
 
@@ -38,7 +38,7 @@ export default function CartPopup({ isOpen, onClose }) {
           cartResponse.data.map(async (item) => {
             try {
               const productResponse = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_URL}/products/${item.product_id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/products/${item.product_id}`,
                 { withCredentials: true },
               )
               return {
@@ -97,7 +97,7 @@ export default function CartPopup({ isOpen, onClose }) {
       setCartCount(updated.reduce((sum, i) => sum + i.quantity, 0)); // ✅ update cart count
   
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`,
         { quantity: newQuantity },
         { withCredentials: true }
       );
@@ -112,7 +112,7 @@ export default function CartPopup({ isOpen, onClose }) {
   // Remove from cart
   const removeFromCart = async (productId) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${productId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`, {
         withCredentials: true,
       })
 
@@ -133,7 +133,7 @@ export default function CartPopup({ isOpen, onClose }) {
     try {
       // Delete items one by one
       const deletePromises = cartItems.map((item) =>
-        axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart/${item.product_id}`, {
+        axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${item.product_id}`, {
           withCredentials: true,
         }),
       )

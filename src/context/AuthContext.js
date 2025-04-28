@@ -1,8 +1,9 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect } from "react"
-import axios from "axios"
 import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+import { loginUser, logoutUser, getCurrentUser, registerUser } from "@/lib/api"
 
 const AuthContext = createContext(undefined)
 
@@ -16,32 +17,34 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkLoggedIn = async () => {
       try {
+        console.log("Checking if user is logged in...")
+
+        // Check if token exists in localStorage
         const token = localStorage.getItem("token")
-        if (token) {
-          // Set default authorization header for all requests
-          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+        if (!token) {
+          console.log("No token found in localStorage")
+          setLoading(false)
+          return
+        }
 
-          // Try to get current user data
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me`, {
-            withCredentials: true,
-          })
+        console.log("Token found, verifying with server...")
+        const res = await getCurrentUser()
+        const userData = res.data.user || res.data
 
-          if (response.data) {
-            setUser(response.data)
-            setIsAuthenticated(true)
+        console.log("User data retrieved:", userData)
+        setUser(userData)
+        setIsAuthenticated(true)
 
-            // Store role in localStorage for easier access in components
-            if (response.data.role) {
-              localStorage.setItem("role", response.data.role)
-            }
-          }
+        // Store role in localStorage for easier access in components
+        if (userData && userData.role) {
+          localStorage.setItem("role", userData.role)
         }
       } catch (error) {
         console.error("Auth check error:", error)
-        // Clear invalid token and role
+        setUser(null)
+        setIsAuthenticated(false)
         localStorage.removeItem("token")
         localStorage.removeItem("role")
-        delete axios.defaults.headers.common["Authorization"]
       } finally {
         setLoading(false)
       }
@@ -50,40 +53,44 @@ export const AuthProvider = ({ children }) => {
     checkLoggedIn()
   }, [])
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
     setLoading(true)
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/login`,
-        { email, password },
-        { withCredentials: true },
-      )
+      console.log("Attempting login with:", credentials.email)
 
-      const { user, token } = response.data
+      const res = await loginUser(credentials)
 
-      // Store token in localStorage
+      // Handle different response formats
+      const userData = res.data.user || res.data
+      const token = res.data.token || res.data.accessToken
+
       if (token) {
         localStorage.setItem("token", token)
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
+        console.log("Token saved to localStorage")
+      } else {
+        console.warn("No token received in login response")
       }
 
-      // Store role in localStorage
-      if (user && user.role) {
-        localStorage.setItem("role", user.role)
-      }
-
-      setUser(user)
+      console.log("Login successful:", userData)
+      setUser(userData)
       setIsAuthenticated(true)
 
-      // Redirect based on user role
-      if (user && user.role === "admin") {
-        router.push("/admin") // Redirect to your admin dashboard
-      } else {
-        router.push("/") // Redirect regular users to home page
+      // Store role in localStorage for easier access in components
+      if (userData && userData.role) {
+        localStorage.setItem("role", userData.role)
       }
 
-      return user
+      // Redirect based on user role
+      if (userData && userData.role === "admin") {
+        router.push("/admin/dashboard")
+      } else {
+        router.push("/")
+      }
+
+      return userData
     } catch (error) {
+      console.error("Login error:", error)
+      toast.error(error.response?.data?.message || "Invalid email or password")
       throw error
     } finally {
       setLoading(false)
@@ -93,67 +100,41 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true)
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, userData, {
-        withCredentials: true,
-      })
+      const res = await registerUser(userData)
+      toast.success("Registration successful!")
 
-      // If registration automatically logs in the user
-      if (response.data.user && response.data.token) {
-        const { user, token } = response.data
-
-        // Store token in localStorage
-        localStorage.setItem("token", token)
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-
-        // Store role in localStorage
-        if (user.role) {
-          localStorage.setItem("role", user.role)
-        }
-
-        setUser(user)
-        setIsAuthenticated(true)
+      // Check if registration returns a token
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token)
       }
 
-      setLoading(false)
-      return response.data
+      // Auto login after registration
+      await login({
+        email: userData.email,
+        password: userData.password,
+      })
+
+      return res.data
     } catch (error) {
-      setLoading(false)
+      console.error("Registration error:", error)
+      toast.error(error.response?.data?.message || "Registration failed")
       throw error
+    } finally {
+      setLoading(false)
     }
   }
 
   const logout = async () => {
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/users/logout`, {}, { withCredentials: true })
+      await logoutUser()
     } catch (error) {
       console.error("Logout error:", error)
     } finally {
       localStorage.removeItem("token")
       localStorage.removeItem("role")
-      delete axios.defaults.headers.common["Authorization"]
       setUser(null)
       setIsAuthenticated(false)
       router.push("/login")
-    }
-  }
-
-  const updateProfile = async (userData) => {
-    try {
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/users/update`, userData, {
-        withCredentials: true,
-      })
-
-      const updatedUser = response.data.user
-
-      // Update role in localStorage if it changed
-      if (updatedUser && updatedUser.role) {
-        localStorage.setItem("role", updatedUser.role)
-      }
-
-      setUser(updatedUser)
-      return response.data
-    } catch (error) {
-      throw error
     }
   }
 
@@ -170,7 +151,6 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        updateProfile,
         isAuthenticated,
         hasAdminAccess,
       }}

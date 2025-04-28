@@ -1,71 +1,95 @@
 import axios from "axios"
 
-// Create axios instance with base URL from environment variable
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+// Create an axios instance with base configuration
+const API = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true, // Important: This enables sending cookies with requests
 })
 
-// Add request interceptor to include auth token
-api.interceptors.request.use(
+// Request interceptor to add auth token
+API.interceptors.request.use(
   (config) => {
+    // Try to get token from localStorage
     const token = localStorage.getItem("token")
+
+    // Add token to headers if it exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+      console.log("Adding token to request:", token.substring(0, 10) + "...")
+    } else {
+      console.log("No token found in localStorage")
     }
+
     return config
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    console.error("Request interceptor error:", error)
+    return Promise.reject(error)
+  },
 )
 
-// Authentication
-export const login = async (email, password) => {
-  const response = await api.post("/auth/login", { email, password })
-  if (response.data.token) {
-    localStorage.setItem("token", response.data.token)
-  }
-  return response.data
-}
+// Response interceptor for global error handling
+API.interceptors.response.use(
+  (response) => {
+    // Check if the response includes a token and save it
+    if (response.data && response.data.token) {
+      localStorage.setItem("token", response.data.token)
+      console.log("Token saved from response")
+    }
+    return response
+  },
+  (error) => {
+    // Handle 401 errors globally
+    if (error.response && error.response.status === 401) {
+      console.error("Unauthorized access (401):", error.response.data)
+      localStorage.removeItem("token")
+      localStorage.removeItem("role")
+      // We don't redirect here to avoid circular dependencies with AuthContext
+    }
+    return Promise.reject(error)
+  },
+)
 
-export const register = async (userData) => {
-  const response = await api.post("/auth/register", userData)
-  if (response.data.token) {
-    localStorage.setItem("token", response.data.token)
-  }
-  return response.data
-}
+// Auth endpoints
+export const loginUser = (data) => API.post("/api/users/login", data)
+export const registerUser = (data) => API.post("/api/users/register", data)
+export const logoutUser = () => API.post("/api/users/logout")
+export const getCurrentUser = () => API.get("/api/users/me")
 
-export const logout = () => {
-  localStorage.removeItem("token")
-}
+// Users endpoints
+export const getAllUsers = () => API.get("/api/users")
+export const getUserById = (id) => API.get(`/api/users/${id}`)
+export const editUser = (id, updatedData) => API.put(`/api/users/${id}`, updatedData)
+export const deleteUser = (id) => API.delete(`/api/users/${id}`)
+export const updateUserProfile = (data) => API.put("/api/users/update", data)
 
-// Contact form
-export const sendContactMessage = async (messageData) => {
-  const response = await api.post("/contact", messageData)
-  return response.data
-}
+// Products endpoints
+export const getAllProducts = () => API.get("/api/products")
+export const getProductById = (id) => API.get(`/api/products/${id}`)
+export const createProduct = (data) => API.post("/api/products", data)
+export const updateProduct = (id, data) => API.put(`/api/products/${id}`, data)
+export const deleteProduct = (id) => API.delete(`/api/products/${id}`)
 
-// Cart
-export const getCart = async () => {
-  const response = await api.get("/cart")
-  return response.data
-}
+// Categories endpoints
+export const getAllCategories = () => API.get("/api/categories")
+export const getCategoryById = (id) => API.get(`/api/categories/${id}`)
+export const createCategory = (data) => API.post("/api/categories", data)
+export const updateCategory = (id, data) => API.put(`/api/categories/${id}`, data)
+export const deleteCategory = (id) => API.delete(`/api/categories/${id}`)
 
-export const addToCart = async (productId, quantity = 1) => {
-  const response = await api.post("/cart/add", { productId, quantity })
-  return response.data
-}
+// Orders endpoints
+export const getOrders = () => API.get("/api/orders").then((res) => res.data)
+export const getOrderById = (id) => API.get(`/api/orders/${id}`).then((res) => res.data)
+export const createOrder = (data) => API.post("/api/orders", data).then((res) => res.data)
+export const updateOrder = (id, data) => API.put(`/api/orders/${id}`, data).then((res) => res.data)
+export const deleteOrder = (id) => API.delete(`/api/orders/${id}`).then((res) => res.data)
 
-export const updateCartItem = async (itemId, quantity) => {
-  const response = await api.put(`/cart/item/${itemId}`, { quantity })
-  return response.data
-}
+// Order Items endpoints
+export const getOrderItems = () => API.get("/api/order-items").then((res) => res.data)
+export const getOrderItemById = (id) => API.get(`/api/order-items/${id}`).then((res) => res.data)
+export const createOrderItem = (data) => API.post("/api/order-items", data).then((res) => res.data)
+export const updateOrderItem = (id, data) => API.put(`/api/order-items/${id}`, data).then((res) => res.data)
+export const deleteOrderItem = (id) => API.delete(`/api/order-items/${id}`).then((res) => res.data)
 
-export const removeCartItem = async (itemId) => {
-  const response = await api.delete(`/cart/item/${itemId}`)
-  return response.data
-}
-
-export default api
+// Export the API instance for other uses
+export default API

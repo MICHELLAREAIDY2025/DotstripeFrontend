@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
-import Header from '@/app/Components/header';
+import Header from '@/app/Components/navbar';
 import Footer from '@/app/Components/footer';
 
 const Contact = () => {

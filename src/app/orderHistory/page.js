@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Header from "../Components/header";
+import Header from "../Components/navbar";
 import Footer from "../Components/footer";
 
 const OrdersHistory = () => {

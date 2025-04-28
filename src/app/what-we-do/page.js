@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import Navbar from "@/app/Components/navbar"
 
 export default function WhatWeDoPage() {
   // Service offerings data

@@ -7,7 +7,8 @@ import { useAuth } from "@/context/AuthContext"
 import { useCart } from "@/context/Cartcontext"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import Navbar from "@/app/Components/navbar"
+import Header from "@/app/Components/navbar"
+
 
 export default function Home() {
   const { user } = useAuth()
@@ -24,7 +25,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#031626] flex flex-col">
-      <Navbar />
+      <Header />
       <ToastContainer />
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-16">
@@ -36,9 +37,7 @@ export default function Home() {
           </h1>
 
           <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto mb-16">
-            <Image src="/images/tech-globe.png" alt="Tech Globe" fill className="object-contain" />
-            {/* Animated orbit ring */}
-            <div className="absolute inset-0 border-2 border-[#17A0BF]/30 rounded-full animate-spin-slow"></div>
+            <Image src="/images/digital-circle-circuit-blue-background-futuristic-technology.png" alt="Tech Globe" fill className="object-contain" />
           </div>
 
           <Link

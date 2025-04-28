@@ -79,20 +79,67 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex text-base lg:text-lg font-medium text-white">
-          <ul className="flex space-x-12 lg:space-x-16">
+          <ul className="flex space-x-16 lg:space-x-24">
             <li>
-              <Link href="/what-we-do" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
-                what we do
+              <Link href="/what-we-do" className="hover:text-[#17A0BF] transition-colors py-2 px-1 flex items-center">
+                What we do
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1 h-4 w-4"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </Link>
             </li>
             <li>
               <Link href="/what-we-think" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
-                what we think
+                What we think
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
-                who we are
+              <Link href="/about" className="hover:text-[#17A0BF] transition-colors py-2 px-1 flex items-center">
+                Who we are
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1 h-4 w-4"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="hover:text-[#17A0BF] transition-colors py-2 px-1 flex items-center">
+                Contact
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-1 h-4 w-4"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </Link>
             </li>
           </ul>
@@ -182,14 +229,68 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-[#031626] border-t border-gray-700 px-4 py-3">
           <nav className="flex flex-col space-y-3 text-white">
-            <button onClick={() => handleNavigation("/what-we-do")} className="text-left py-2 hover:text-[#17A0BF]">
-              what we do
+            <button
+              onClick={() => handleNavigation("/what-we-do")}
+              className="text-left py-2 hover:text-[#17A0BF] flex items-center"
+            >
+              What we do
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-1 h-4 w-4"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </button>
             <button onClick={() => handleNavigation("/what-we-think")} className="text-left py-2 hover:text-[#17A0BF]">
-              what we think
+              What we think
             </button>
-            <button onClick={() => handleNavigation("/about")} className="text-left py-2 hover:text-[#17A0BF]">
-              who we are
+            <button
+              onClick={() => handleNavigation("/about")}
+              className="text-left py-2 hover:text-[#17A0BF] flex items-center"
+            >
+              Who we are
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-1 h-4 w-4"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <button
+              onClick={() => handleNavigation("/contact")}
+              className="text-left py-2 hover:text-[#17A0BF] flex items-center"
+            >
+              Contact
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-1 h-4 w-4"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
             </button>
 
             <div className="border-t border-gray-700 my-2"></div>

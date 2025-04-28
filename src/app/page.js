@@ -7,8 +7,8 @@ import { useAuth } from "@/context/AuthContext"
 import { useCart } from "@/context/Cartcontext"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import Header from "@/app/Components/navbar"
-
+import Navbar from "@/app/Components/navbar"
+import Footer from "@/app/Components/footer"
 
 export default function Home() {
   const { user } = useAuth()
@@ -25,48 +25,31 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#031626] flex flex-col">
-      <Header />
+      <Navbar />
       <ToastContainer />
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-32 pb-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-16">
-            ...YOUR PATHWAY 
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-16">
+            ...YOUR PATHWAY
             <br />
             TO TECH EXCELLENCE...
           </h1>
 
-          <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto mb-16">
-            <Image src="/images/digital-circle-circuit-blue-background-futuristic-technology.png" alt="Tech Globe" fill className="object-contain" />
+          <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 mx-auto mb-16">
+            <Image src="/images/tech-globe.png" alt="Tech Globe" fill className="object-contain" priority />
           </div>
 
           <Link
             href={user ? "/what-we-do" : "/register"}
-            className="inline-block bg-[#18608C] text-white py-3 px-8 rounded-md font-semibold hover:bg-[#17A0BF] transition duration-300"
+            className="inline-block bg-[#18608C] text-white py-3 px-12 rounded-md font-semibold hover:bg-[#17A0BF] transition duration-300 text-lg"
           >
             Get Started
           </Link>
         </div>
       </main>
 
-      <footer className="bg-[#031626] border-t border-[#0E4459] py-6 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <p className="text-white/70 text-sm">© {new Date().getFullYear()} Dot Stripe. All rights reserved.</p>
-          </div>
-          <div className="flex space-x-8">
-            <Link href="/contact" className="text-white/70 hover:text-white text-sm">
-              Contact
-            </Link>
-            <Link href="/privacy" className="text-white/70 hover:text-white text-sm">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-white/70 hover:text-white text-sm">
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

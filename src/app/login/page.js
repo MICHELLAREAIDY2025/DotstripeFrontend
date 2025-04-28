@@ -24,7 +24,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login(email, password)
+      const user = await login(email, password)
       toast.success("Login successful")
       // Router navigation is handled in the login function in AuthContext
     } catch (err) {

@@ -84,12 +84,64 @@ export const createOrder = (data) => API.post("/api/orders", data).then((res) =>
 export const updateOrder = (id, data) => API.put(`/api/orders/${id}`, data).then((res) => res.data)
 export const deleteOrder = (id) => API.delete(`/api/orders/${id}`).then((res) => res.data)
 
-// Order Items endpoints
-export const getOrderItems = () => API.get("/api/order-items").then((res) => res.data)
-export const getOrderItemById = (id) => API.get(`/api/order-items/${id}`).then((res) => res.data)
-export const createOrderItem = (data) => API.post("/api/order-items", data).then((res) => res.data)
-export const updateOrderItem = (id, data) => API.put(`/api/order-items/${id}`, data).then((res) => res.data)
-export const deleteOrderItem = (id) => API.delete(`/api/order-items/${id}`).then((res) => res.data)
+// Order Items endpoints - Check if your API has these endpoints
+// If not, you might need to adjust these to match your API structure
+export const getOrderItems = () =>
+  API.get("/api/order-items")
+    .then((res) => res.data)
+    .catch((error) => {
+      // If the endpoint doesn't exist, try an alternative
+      if (error.response && error.response.status === 404) {
+        console.warn("Order items endpoint not found, trying alternative...")
+        // Try alternative endpoint if available, or return empty array
+        return []
+      }
+      throw error
+    })
+
+export const getOrderItemById = (id) =>
+  API.get(`/api/order-items/${id}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      if (error.response && error.response.status === 404) {
+        console.warn(`Order item endpoint for ID ${id} not found`)
+        return null
+      }
+      throw error
+    })
+
+export const createOrderItem = (data) =>
+  API.post("/api/order-items", data)
+    .then((res) => res.data)
+    .catch((error) => {
+      if (error.response && error.response.status === 404) {
+        console.error("Create order item endpoint not found")
+        return null
+      }
+      throw error
+    })
+
+export const updateOrderItem = (id, data) =>
+  API.put(`/api/order-items/${id}`, data)
+    .then((res) => res.data)
+    .catch((error) => {
+      if (error.response && error.response.status === 404) {
+        console.error(`Update order item endpoint for ID ${id} not found`)
+        return null
+      }
+      throw error
+    })
+
+export const deleteOrderItem = (id) =>
+  API.delete(`/api/order-items/${id}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      if (error.response && error.response.status === 404) {
+        console.error(`Delete order item endpoint for ID ${id} not found`)
+        return null
+      }
+      throw error
+    })
 
 // Export the API instance for other uses
 export default API

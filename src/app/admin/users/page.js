@@ -9,7 +9,7 @@ import { validateAddress } from "@/app/Components/checkout/utils/validation"
 import AddressForm from "@/app/Components/checkout/AddressForm"
 import { confirmAlert } from "react-confirm-alert"
 import "react-confirm-alert/src/react-confirm-alert.css"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/app/context/AuthContext"
 import { useRouter } from "next/navigation"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
@@ -239,191 +239,150 @@ const UsersPage = () => {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <ToastContainer position="top-center" />
-      <h1 className="text-2xl font-bold text-center">Manage Users</h1>
-      {isAdmin ? (
-        <>
-          {/* Role Filter */}
-          <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
-            <label className="text-lg font-medium">Filter by role:</label>
-            <select onChange={(e) => setRoleFilter(e.target.value)} className="p-2 border rounded-md w-full sm:w-auto">
-              <option value="all">All</option>
-              <option value="admin">Admin</option>
-              <option value="customer">Customer</option>
-            </select>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+
+      {/* User Form */}
+      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 className="text-xl font-bold mb-4">{editUserId ? "Edit User" : "Add New User"}</h2>
+        <form ref={formRef} onSubmit={editUserId ? handleUpdateUser : handleAddUser} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                value={newUser.name}
+                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                required={!editUserId}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+              <select
+                value={newUser.role}
+                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+              >
+                <option value="customer">Customer</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
           </div>
 
-          {/* Users Table */}
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#18608C] mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading users...</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border border-gray-300 text-sm sm:text-base">
-                <thead>
-                  <tr className="bg-[#4A8C8C] text-white">
-                    <th className="border p-2">ID</th>
-                    <th className="border p-2">Name</th>
-                    <th className="border p-2">Email</th>
-                    <th className="border p-2">Role</th>
-                    <th className="border p-2">Address</th>
-                    <th className="border p-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="text-center p-2">
-                        No users found
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <tr key={user.id} className="text-center">
-                        <td className="border p-2">{user.id}</td>
-                        <td className="border p-2">{user.name}</td>
-                        <td className="border p-2">{user.email}</td>
-                        <td className="border p-2">{user.role}</td>
-                        <td className="border p-2">
-                          {user.address
-                            ? `${user.address.region || ""}, ${user.address["address-direction"] || ""}, ${user.address.building || ""}, ${user.address.floor || ""}, ${user.address.phone || ""}`
-                            : "N/A"}
-                        </td>
-                        <td className="border p-2">
-                          <button onClick={() => handleDeleteUser(user.id, user.name)} className="text-red-700 mr-2">
-                            <FiTrash className="inline-block h-5 w-5 text-red-700 hover:scale-105 transition " />
-                          </button>
-                          <button onClick={() => handleEditUser(user)} className="text-[#A68F7B]">
-                            <FiEdit className="inline-block h-5 w-5 hover:scale-105 transition " />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <AddressForm
+            address={newUser.address}
+            onChange={(address) => setNewUser({ ...newUser, address })}
+            errors={formErrors}
+          />
 
-          {/* Add or Edit User Form */}
-          <div className="my-6 bg-gray-100 p-4 rounded-md">
-            {editUserId ? (
-              <>
-                <h2 ref={formRef} className="text-xl font-bold mb-2">
-                  Edit User
-                </h2>
-                <form onSubmit={handleUpdateUser} className="flex flex-col gap-3">
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    value={newUser.name}
-                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                    required
-                    className="border p-2 rounded-md"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    required
-                    className="border p-2 rounded-md"
-                  />
-                  <select
-                    value={newUser.role}
-                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                    className="border p-2 rounded-md"
-                  >
-                    <option value="customer">Customer</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                  {/* Address Form */}
-                  <AddressForm
-                    address={newUser.address}
-                    updateAddress={(updatedAddress) =>
-                      setNewUser({ ...newUser, address: { ...newUser.address, ...updatedAddress } })
-                    }
-                  />
-                  <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-                    Update User
-                  </button>
-                  <button type="button" onClick={resetForm} className="bg-gray-400 text-white p-2 rounded-md">
-                    Cancel
-                  </button>
-                </form>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold mb-2">Add User</h2>
-                <form onSubmit={handleAddUser} className="flex flex-col gap-3">
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    value={newUser.name}
-                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                    required
-                    className="border p-2 rounded-md"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    required
-                    className="border p-2 rounded-md"
-                  />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={newUser.password}
-                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    required
-                    className="border p-2 rounded-md"
-                  />
-
-                  {/* Address Form */}
-                  <AddressForm
-                    address={newUser.address}
-                    updateAddress={(updatedAddress) =>
-                      setNewUser({ ...newUser, address: { ...newUser.address, ...updatedAddress } })
-                    }
-                  />
-                  <select
-                    value={newUser.role}
-                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                    className="border p-2 rounded-md"
-                  >
-                    <option value="customer">Customer</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                  <button type="submit" className="bg-[#4A8C8C] text-white p-2 rounded-md">
-                    Add User
-                  </button>
-                </form>
-              </>
+          <div className="flex justify-end space-x-2">
+            {editUserId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditUserId(null)
+                  resetForm()
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
             )}
+            <button
+              type="submit"
+              className="px-4 py-2 bg-[#E2C269] text-[#1B2930] rounded-md hover:bg-[#E2C269]/90"
+            >
+              {editUserId ? "Update User" : "Add User"}
+            </button>
           </div>
-        </>
-      ) : (
-        <div className="text-center py-8">
-          <p className="text-red-500 text-lg">Access denied. Admins only.</p>
-          <p className="mt-2 text-gray-600">You will be redirected to the login page...</p>
-        </div>
-      )}
+        </form>
+      </div>
 
-      {/* Debug information for troubleshooting */}
-      {process.env.NODE_ENV !== "production" && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-md text-xs">
-          <h3 className="font-bold mb-2">Debug Information:</h3>
-          <p>User: {user ? `ID: ${user.id}, Role: ${user.role}` : "Not logged in"}</p>
-          <p>Admin Status: {isAdmin ? "Admin" : "Not Admin"}</p>
-          <p>API URL: {API_URL || "Not set"}</p>
-          <p>Token Present: {localStorage.getItem("token") ? "Yes" : "No"}</p>
+      {/* User List */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Users List</h2>
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+          >
+            <option value="all">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="customer">Customer</option>
+          </select>
         </div>
-      )}
+
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#E2C269]"></div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border p-2">ID</th>
+                  <th className="border p-2">Name</th>
+                  <th className="border p-2">Email</th>
+                  <th className="border p-2">Role</th>
+                  <th className="border p-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="border p-2 text-center">{user.id}</td>
+                    <td className="border p-2">{user.name}</td>
+                    <td className="border p-2">{user.email}</td>
+                    <td className="border p-2 text-center">{user.role}</td>
+                    <td className="border p-2 text-center">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="text-blue-600 hover:text-blue-800 mr-2"
+                      >
+                        <FiEdit className="inline-block h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id, user.name)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <FiTrash className="inline-block h-5 w-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <ToastContainer position="bottom-right" />
     </div>
   )
 }

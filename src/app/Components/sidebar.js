@@ -4,8 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { useAuth } from "@/context/AuthContext"
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, ChevronLeft, ChevronRight, LogOut } from "lucide-react"
+import { useAuth } from "@/app/context/AuthContext"
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, ChevronLeft, ChevronRight, LogOut, Home } from "lucide-react"
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false)
@@ -13,6 +13,11 @@ const Sidebar = () => {
   const { logout } = useAuth()
 
   const menuItems = [
+    {
+      title: "Home",
+      icon: <Home size={20} />,
+      path: "/",
+    },
     {
       title: "Dashboard",
       icon: <LayoutDashboard size={20} />,

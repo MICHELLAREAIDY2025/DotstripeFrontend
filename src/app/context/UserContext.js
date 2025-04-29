@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect } from "react"
-import { getAllUsers, editUser, deleteUser, registerUser } from "../lib/api"
+import { getAllUsers, editUser, deleteUser, registerUser } from "../../lib/api"
 import { toast } from "react-toastify"
 
 const UsersContext = createContext()

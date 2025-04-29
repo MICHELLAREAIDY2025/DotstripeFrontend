@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/app/context/AuthContext"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { LogIn, ArrowRight, ArrowLeft } from "lucide-react"

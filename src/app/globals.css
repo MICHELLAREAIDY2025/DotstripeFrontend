@@ -1,8 +1,13 @@
-@import "tailwindcss/preflight";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
+  --primary: #031626;
+  --secondary: #18608C;
+  --tertiary: #0E4459;
+  --accent: #17A0BF;
+  --highlight: #7EF2F2;
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -18,9 +23,18 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
   .animate-spin-slow {
     animation: spin 20s linear infinite;
   }

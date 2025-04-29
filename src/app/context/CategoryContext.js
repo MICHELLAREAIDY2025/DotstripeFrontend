@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { getAllCategories } from "../lib/api"
+import { getAllCategories } from "../../lib/api"
 import { toast } from "react-toastify"
 
 const CategoryContext = createContext()

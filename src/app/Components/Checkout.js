@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/app/context/AuthContext"
 import { ToastContainer } from "react-toastify"
-import { useCart } from "@/context/Cartcontext" // Add this import
+import { useCart } from "@/app/context/Cartcontext" // Add this import
 import "react-toastify/dist/ReactToastify.css"
 
 import { fetchCheckoutData } from "./checkout/utils/api"

@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import Navbar from "@/app/Components/navbar"
+import Footer from "@/app/Components/footer"
 
 export default function WhatWeDoPage() {
   // Service offerings data
@@ -55,6 +56,7 @@ export default function WhatWeDoPage() {
 
   return (
     <div className="min-h-screen bg-[#031626] flex flex-col">
+      <Navbar />
       {/* Main content */}
       <main className="flex-1 flex flex-col">
         {/* Hero section */}
@@ -111,33 +113,7 @@ export default function WhatWeDoPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#1a3b4b] py-8 px-4">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-white text-lg font-medium mb-2">Contact</h3>
-            <p className="text-white">Info@Dot-Stripe.Com</p>
-          </div>
-
-          <div className="flex justify-center">
-            <Link
-              href="/contact"
-              className="bg-[#2d6a8e] text-white px-6 py-3 rounded-md hover:bg-[#18608C] transition-colors"
-            >
-              CONTACT US
-            </Link>
-          </div>
-
-          <div className="text-right">
-            <h3 className="text-white text-lg font-medium mb-2">Location</h3>
-            <p className="text-white">Beirut,Lebanon</p>
-            <p className="text-white">75008 Paris FRANCE</p>
-          </div>
-        </div>
-        <div className="max-w-6xl mx-auto mt-8 text-center md:text-center">
-          <p className="text-white">Copywrite© Dot Stripe 2025</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

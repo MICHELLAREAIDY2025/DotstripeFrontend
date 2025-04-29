@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { getAllProducts, createProduct, updateProduct as updateProductAPI, deleteProduct } from "../lib/api"
+import { getAllProducts, createProduct, updateProduct as updateProductAPI, deleteProduct } from "../../lib/api"
 import { toast } from "react-toastify"
 
 const ProductContext = createContext()

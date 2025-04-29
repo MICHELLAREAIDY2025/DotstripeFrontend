@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useAuth } from "@/context/AuthContext"
-import { useCart } from "@/context/Cartcontext"
+import { useAuth } from "@/app/context/AuthContext"
+import { useCart } from "@/app/context/Cartcontext"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -55,12 +55,12 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
-            <div className="relative h-12 w-32 md:h-14 md:w-36">
+            <div className="relative h-16 w-40 md:h-20 md:w-48">
               <Image
                 src="/images/DotStripeLogo.png"
                 alt="Dot Stripe Logo"
-                width={140}
-                height={60}
+                width={200}
+                height={80}
                 className="object-contain"
                 priority
               />
@@ -79,24 +79,10 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex text-base lg:text-lg font-medium text-white">
-          <ul className="flex space-x-16 lg:space-x-24">
+          <ul className="flex items-center space-x-8 lg:space-x-12">
             <li>
-              <Link href="/what-we-do" className="hover:text-[#17A0BF] transition-colors py-2 px-1 flex items-center">
+              <Link href="/what-we-do" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 What we do
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="ml-1 h-4 w-4"
-                >
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
               </Link>
             </li>
             <li>
@@ -105,41 +91,13 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-[#17A0BF] transition-colors py-2 px-1 flex items-center">
+              <Link href="/about" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 Who we are
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="ml-1 h-4 w-4"
-                >
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:text-[#17A0BF] transition-colors py-2 px-1 flex items-center">
+              <Link href="/contact" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 Contact
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="ml-1 h-4 w-4"
-                >
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
               </Link>
             </li>
           </ul>
@@ -229,68 +187,17 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-[#031626] border-t border-gray-700 px-4 py-3">
           <nav className="flex flex-col space-y-3 text-white">
-            <button
-              onClick={() => handleNavigation("/what-we-do")}
-              className="text-left py-2 hover:text-[#17A0BF] flex items-center"
-            >
+            <button onClick={() => handleNavigation("/what-we-do")} className="text-left py-2 hover:text-[#17A0BF]">
               What we do
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="ml-1 h-4 w-4"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
             </button>
             <button onClick={() => handleNavigation("/what-we-think")} className="text-left py-2 hover:text-[#17A0BF]">
               What we think
             </button>
-            <button
-              onClick={() => handleNavigation("/about")}
-              className="text-left py-2 hover:text-[#17A0BF] flex items-center"
-            >
+            <button onClick={() => handleNavigation("/about")} className="text-left py-2 hover:text-[#17A0BF]">
               Who we are
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="ml-1 h-4 w-4"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
             </button>
-            <button
-              onClick={() => handleNavigation("/contact")}
-              className="text-left py-2 hover:text-[#17A0BF] flex items-center"
-            >
+            <button onClick={() => handleNavigation("/contact")} className="text-left py-2 hover:text-[#17A0BF]">
               Contact
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="ml-1 h-4 w-4"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
             </button>
 
             <div className="border-t border-gray-700 my-2"></div>

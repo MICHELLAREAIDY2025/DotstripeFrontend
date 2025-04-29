@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { getAllCategories } from "../../lib/api"
+import { getAllCategories, createCategory, updateCategory, deleteCategory } from "../../lib/api"
 import { toast } from "react-toastify"
 
 const CategoryContext = createContext()
@@ -37,14 +37,63 @@ export const CategoryProvider = ({ children }) => {
     }
   }
 
+  const addCategory = async (categoryData) => {
+    try {
+      const response = await createCategory(categoryData)
+      await fetchCategories() // Refresh the categories list
+      return response.data
+    } catch (error) {
+      console.error("Error adding category:", error)
+      throw error
+    }
+  }
+
+  const editCategory = async (id, categoryData) => {
+    try {
+      const response = await updateCategory(id, categoryData)
+      await fetchCategories() // Refresh the categories list
+      return response.data
+    } catch (error) {
+      console.error("Error updating category:", error)
+      throw error
+    }
+  }
+
+  const removeCategory = async (id) => {
+    try {
+      await deleteCategory(id)
+      await fetchCategories() // Refresh the categories list
+    } catch (error) {
+      console.error("Error deleting category:", error)
+      throw error
+    }
+  }
+
   useEffect(() => {
     console.log("CategoryProvider: useEffect triggered")
     fetchCategories()
   }, [])
 
   return (
-    <CategoryContext.Provider value={{ categories, loading, fetchCategories }}>{children}</CategoryContext.Provider>
+    <CategoryContext.Provider 
+      value={{ 
+        categories, 
+        loading, 
+        fetchCategories,
+        addCategory,
+        editCategory,
+        removeCategory
+      }}
+    >
+      {children}
+    </CategoryContext.Provider>
   )
 }
 
-export const useCategories = () => useContext(CategoryContext)
+export const useCategories = () => {
+  const context = useContext(CategoryContext)
+  if (!context) {
+    throw new Error("useCategories must be used within a CategoryProvider")
+  }
+  return context
+}

@@ -85,8 +85,8 @@ export default function LoginPage() {
             </div>
 
             <div className="max-w-md mx-auto text-center">
-              <h1 className="text-4xl font-bold text-white mb-6">Welcome Back</h1>
-              <p className="text-white/90 text-lg leading-relaxed mb-8">
+              <h1 className="text-4xl font-bold text-white mb-6 uppercase">Welcome Back</h1>
+              <p className="text-white/90 text-lg leading-relaxed mb-8 uppercase">
                 Sign in to access your account and continue your journey with DotStripe.
               </p>
 
@@ -95,8 +95,8 @@ export default function LoginPage() {
                   <span className="text-white">🔒</span>
                 </div>
                 <div className="text-left">
-                  <p className="text-white/90 text-sm">Secure Login</p>
-                  <p className="text-white/70 text-xs">Your data is protected with industry-standard encryption</p>
+                  <p className="text-white/90 text-sm uppercase">Secure Login</p>
+                  <p className="text-white/70 text-xs uppercase">Your data is protected with industry-standard encryption</p>
                 </div>
               </div>
             </div>

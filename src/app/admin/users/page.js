@@ -48,92 +48,150 @@ const UsersPage = () => {
     filterUsers()
   }, [roleFilter, users])
 
-  const checkAdminStatus = () => {
-    const storedRole = localStorage.getItem("role")
-    const token = localStorage.getItem("token")
+  const checkAdminStatus = async () => {
+    if (!user) {
+      router.push("/login")
+      return
+    }
 
-    console.log("Checking admin status - Role:", storedRole)
-    console.log("Checking admin status - Token:", token ? "Present" : "Missing")
+    try {
+      const token = localStorage.getItem("token")
+      const response = await axios.get(`${API_URL}/api/users/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      })
 
-    if (storedRole === "admin" && token) {
+      if (response.data.user.role !== "admin") {
+        router.push("/")
+        return
+      }
+
       setIsAdmin(true)
       fetchUsers()
-    } else if (user && user.role === "admin") {
-      setIsAdmin(true)
-      fetchUsers()
-    } else {
-      setIsAdmin(false)
-      toast.error("Access denied. Admins only.")
-      setTimeout(() => {
-        router.push("/login")
-      }, 3000)
+    } catch (error) {
+      console.error("Error checking admin status:", error)
+      router.push("/login")
     }
   }
 
   const fetchUsers = async () => {
-    setLoading(true)
     try {
       const token = localStorage.getItem("token")
-      if (!token) {
-        toast.error("Authentication token missing")
-        setLoading(false)
-        return
-      }
-
-      // Ensure the token is set in the headers
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-
-      const res = await axios.get(`${API_URL}/api/users`, {
+      const response = await axios.get(`${API_URL}/api/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         withCredentials: true,
       })
-
-      console.log("Users API response:", res.data)
-
-      // Handle different response formats
-      let usersData = []
-      if (res.data && Array.isArray(res.data.users)) {
-        usersData = res.data.users
-      } else if (res.data && Array.isArray(res.data)) {
-        usersData = res.data
-      } else if (res.data && res.data.data && Array.isArray(res.data.data)) {
-        usersData = res.data.data
-      }
-
-      setUsers(usersData)
+      setUsers(response.data.users)
+      setFilteredUsers(response.data.users)
+      setLoading(false)
     } catch (error) {
       console.error("Error fetching users:", error)
-      toast.error("Error fetching users: " + (error.response?.data?.message || error.message))
-    } finally {
+      toast.error("Failed to fetch users")
       setLoading(false)
     }
   }
 
   const filterUsers = () => {
-    setFilteredUsers(users.filter((user) => roleFilter === "all" || user.role === roleFilter))
+    if (roleFilter === "all") {
+      setFilteredUsers(users)
+    } else {
+      setFilteredUsers(users.filter((user) => user.role === roleFilter))
+    }
   }
 
   const handleAddUser = async (e) => {
     e.preventDefault()
     setFormErrors({})
 
+    // Debug log for initial state
+    console.log("Starting handleAddUser with newUser:", newUser)
+
+    // Validate password
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/
+    if (!passwordRegex.test(newUser.password)) {
+      console.log("Password validation failed")
+      toast.error("Password must be at least 6 characters long, contain at least 1 uppercase letter and 1 number")
+      return
+    }
+
+    // Validate email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    if (!emailRegex.test(newUser.email)) {
+      console.log("Email validation failed")
+      toast.error("Please enter a valid email address")
+      return
+    }
+
     if (!validateAddress(newUser.address)) {
+      console.log("Address validation failed")
       return
     }
 
     try {
       const token = localStorage.getItem("token")
-      await axios.post(`${API_URL}/api/users/register`, newUser, {
+      console.log("Token:", token ? "Present" : "Missing")
+      
+      // Log the raw newUser data
+      console.log("Raw newUser data:", newUser)
+
+      // Format the user data according to the backend expectations
+      const userData = {
+        name: newUser.name.trim(),
+        email: newUser.email.trim(),
+        password: newUser.password,
+        role: newUser.role,
+        address: JSON.stringify({
+          region: newUser.address.region?.trim() || "",
+          "address-direction": newUser.address["address-direction"]?.trim() || "",
+          phone: newUser.address.phone?.trim() || "",
+          building: newUser.address.building?.trim() || "",
+          floor: newUser.address.floor?.trim() || ""
+        })
+      }
+
+      // Log the formatted data being sent
+      console.log("Formatted user data being sent:", userData)
+      console.log("API URL:", `${API_URL}/api/users/register`)
+
+      // Make the API call
+      console.log("Making API call...")
+      const response = await axios.post(`${API_URL}/api/users/register`, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         withCredentials: true,
       })
-      fetchUsers()
-      resetForm()
-      toast.success("User added successfully!")
+
+      console.log("API Response:", response)
+
+      if (response.status === 201) {
+        console.log("User added successfully")
+        await fetchUsers() // Wait for users to be fetched
+        resetForm()
+        toast.success("User added successfully!")
+      }
     } catch (error) {
       console.error("Error adding user:", error)
-      toast.error("Failed to add user: " + (error.response?.data?.message || error.message))
+      console.error("Error response:", error.response?.data)
+      console.error("Error status:", error.response?.status)
+      console.error("Error headers:", error.response?.headers)
+      console.error("Error config:", error.config)
+      
+      let errorMessage = "Failed to add user"
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      toast.error(errorMessage)
     }
   }
 
@@ -199,24 +257,94 @@ const UsersPage = () => {
     e.preventDefault()
     setFormErrors({})
 
+    // Debug log for initial state
+    console.log("Starting handleUpdateUser with newUser:", newUser)
+
+    // Validate email if it's being changed
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    if (newUser.email && !emailRegex.test(newUser.email)) {
+      console.log("Email validation failed")
+      toast.error("Please enter a valid email address")
+      return
+    }
+
+    // Validate password if it's being changed
+    if (newUser.password) {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/
+      if (!passwordRegex.test(newUser.password)) {
+        console.log("Password validation failed")
+        toast.error("Password must be at least 6 characters long, contain at least 1 uppercase letter and 1 number")
+        return
+      }
+    }
+
     if (!validateAddress(newUser.address)) {
+      console.log("Address validation failed")
       return
     }
 
     try {
       const token = localStorage.getItem("token")
-      await axios.put(`${API_URL}/api/users/${editUserId}`, newUser, {
+      console.log("Token:", token ? "Present" : "Missing")
+
+      // Format the user data according to the backend expectations
+      const userData = {
+        name: newUser.name.trim(),
+        email: newUser.email.trim(),
+        role: newUser.role,
+        address: JSON.stringify({
+          region: newUser.address.region?.trim() || "",
+          "address-direction": newUser.address["address-direction"]?.trim() || "",
+          phone: newUser.address.phone?.trim() || "",
+          building: newUser.address.building?.trim() || "",
+          floor: newUser.address.floor?.trim() || ""
+        })
+      }
+
+      // Only include password if it's being changed
+      if (newUser.password) {
+        userData.password = newUser.password
+      }
+
+      // Log the formatted data being sent
+      console.log("Formatted user data being sent:", userData)
+      console.log("API URL:", `${API_URL}/api/users/${editUserId}`)
+
+      // Make the API call
+      console.log("Making API call...")
+      const response = await axios.put(`${API_URL}/api/users/${editUserId}`, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         withCredentials: true,
       })
-      fetchUsers()
-      resetForm()
-      toast.success("User updated successfully!")
+
+      console.log("API Response:", response)
+
+      if (response.status === 200) {
+        console.log("User updated successfully")
+        await fetchUsers() // Wait for users to be fetched
+        resetForm()
+        toast.success("User updated successfully!")
+      }
     } catch (error) {
       console.error("Error updating user:", error)
-      toast.error("Failed to update user: " + (error.response?.data?.message || error.message))
+      console.error("Error response:", error.response?.data)
+      console.error("Error status:", error.response?.status)
+      console.error("Error headers:", error.response?.headers)
+      console.error("Error config:", error.config)
+      
+      let errorMessage = "Failed to update user"
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      toast.error(errorMessage)
     }
   }
 
@@ -295,7 +423,7 @@ const UsersPage = () => {
 
           <AddressForm
             address={newUser.address}
-            onChange={(address) => setNewUser({ ...newUser, address })}
+            updateAddress={(address) => setNewUser({ ...newUser, address })}
             errors={formErrors}
           />
 
@@ -325,11 +453,11 @@ const UsersPage = () => {
       {/* User List */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Users List</h2>
+          <h2 className="text-xl font-bold">Users</h2>
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+            className="p-2 border border-gray-300 rounded-md"
           >
             <option value="all">All Roles</option>
             <option value="admin">Admin</option>
@@ -343,36 +471,36 @@ const UsersPage = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border p-2">ID</th>
-                  <th className="border p-2">Name</th>
-                  <th className="border p-2">Email</th>
-                  <th className="border p-2">Role</th>
-                  <th className="border p-2">Actions</th>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-white divide-y divide-gray-200">
                 {filteredUsers.map((user) => (
                   <tr key={user.id}>
-                    <td className="border p-2 text-center">{user.id}</td>
-                    <td className="border p-2">{user.name}</td>
-                    <td className="border p-2">{user.email}</td>
-                    <td className="border p-2 text-center">{user.role}</td>
-                    <td className="border p-2 text-center">
-                      <button
-                        onClick={() => handleEditUser(user)}
-                        className="text-blue-600 hover:text-blue-800 mr-2"
-                      >
-                        <FiEdit className="inline-block h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id, user.name)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FiTrash className="inline-block h-5 w-5" />
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap capitalize">{user.role}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEditUser(user)}
+                          className="text-[#E2C269] hover:text-[#E2C269]/80"
+                        >
+                          <FiEdit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.id, user.name)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <FiTrash className="h-5 w-5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -381,8 +509,6 @@ const UsersPage = () => {
           </div>
         )}
       </div>
-
-      <ToastContainer position="bottom-right" />
     </div>
   )
 }

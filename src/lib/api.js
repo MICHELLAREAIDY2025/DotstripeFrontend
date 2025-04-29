@@ -66,8 +66,16 @@ export const updateUserProfile = (data) => API.put("/api/users/update", data)
 // Products endpoints
 export const getAllProducts = () => API.get("/api/products")
 export const getProductById = (id) => API.get(`/api/products/${id}`)
-export const createProduct = (data) => API.post("/api/products", data)
-export const updateProduct = (id, data) => API.put(`/api/products/${id}`, data)
+export const createProduct = (data) => API.post("/api/products", data, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+})
+export const updateProduct = (id, data) => API.put(`/api/products/${id}`, data, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+})
 export const deleteProduct = (id) => API.delete(`/api/products/${id}`)
 
 // Categories endpoints

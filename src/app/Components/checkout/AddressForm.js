@@ -1,6 +1,12 @@
 "use client"
 
-export default function AddressForm({ address, updateAddress }) {
+export default function AddressForm({ address, updateAddress, errors = {} }) {
+  const handleAddressChange = (field, value) => {
+    if (updateAddress) {
+      updateAddress({ ...address, [field]: value })
+    }
+  }
+
   return (
     <div>
       <h3 className="text-lg font-semibold mt-6">Address</h3>
@@ -9,26 +15,26 @@ export default function AddressForm({ address, updateAddress }) {
           type="text"
           className="border p-2 rounded"
           placeholder="Region"
-          value={address.region}
-          onChange={(e) => updateAddress({ region: e.target.value })}
+          value={address.region || ""}
+          onChange={(e) => handleAddressChange("region", e.target.value)}
         />
         <input
           type="text"
           className="border p-2 rounded"
           placeholder="Address Directions"
-          value={address["address-direction"]}
-          onChange={(e) => updateAddress({ "address-direction": e.target.value })}
+          value={address["address-direction"] || ""}
+          onChange={(e) => handleAddressChange("address-direction", e.target.value)}
         />
         <input
           type="text"
           className="border p-2 rounded"
           placeholder="Phone Number (e.g., +1234567890)"
-          value={address.phone}
+          value={address.phone || ""}
           onChange={(e) => {
             const value = e.target.value
             const sanitizedValue = value.replace(/[^+\d]/g, "")
             if (sanitizedValue.startsWith("+") && sanitizedValue.length <= 16) {
-              updateAddress({ phone: sanitizedValue })
+              handleAddressChange("phone", sanitizedValue)
             }
           }}
         />
@@ -37,15 +43,15 @@ export default function AddressForm({ address, updateAddress }) {
             type="text"
             className="border p-2 rounded"
             placeholder="Building"
-            value={address.building}
-            onChange={(e) => updateAddress({ building: e.target.value })}
+            value={address.building || ""}
+            onChange={(e) => handleAddressChange("building", e.target.value)}
           />
           <input
             type="text"
             className="border p-2 rounded"
             placeholder="Floor Number"
-            value={address.floor}
-            onChange={(e) => updateAddress({ floor: e.target.value.replace(/\D/g, "").slice(0, 3) })}
+            value={address.floor || ""}
+            onChange={(e) => handleAddressChange("floor", e.target.value.replace(/\D/g, "").slice(0, 3))}
           />
         </div>
       </div>

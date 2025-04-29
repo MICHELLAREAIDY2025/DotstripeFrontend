@@ -98,7 +98,7 @@ const ProductList = ({
             <div key={product.id} className="bg-gray-100 p-4 rounded-md shadow">
               <div className="h-32 flex items-center justify-center overflow-hidden bg-white rounded-md mb-2">
                 <img
-                  src={parseProductImage(product.image) || "/images/product-placeholder.png"}
+                  src={parseProductImage(product.image_url) || "/images/product-placeholder.png"}
                   alt={product.name || "Product"}
                   className="h-full w-full object-contain"
                   onError={(e) => {

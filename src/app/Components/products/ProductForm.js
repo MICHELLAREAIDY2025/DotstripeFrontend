@@ -34,8 +34,8 @@ const ProductForm = ({ selectedProduct, onSuccess }) => {
       })
 
       // Set image preview if available
-      if (selectedProduct.image) {
-        setImagePreview(parseProductImage(selectedProduct.image))
+      if (selectedProduct.image_url) {
+        setImagePreview(parseProductImage(selectedProduct.image_url))
       } else {
         setImagePreview("")
       }
@@ -63,9 +63,11 @@ const ProductForm = ({ selectedProduct, onSuccess }) => {
     if (!file) return
 
     try {
+      console.log("Selected image file:", file);
       // Create preview
       const reader = new FileReader()
       reader.onloadend = () => {
+        console.log("Image preview created");
         setImagePreview(reader.result)
       }
       reader.readAsDataURL(file)
@@ -82,6 +84,7 @@ const ProductForm = ({ selectedProduct, onSuccess }) => {
     setIsUploading(true)
 
     try {
+      console.log("Submitting form with data:", formData);
       // Create FormData for multipart/form-data submission
       const productFormData = new FormData()
       productFormData.append("name", formData.name)
@@ -92,16 +95,23 @@ const ProductForm = ({ selectedProduct, onSuccess }) => {
 
       // Only append image if a new one is selected
       if (formData.image) {
+        console.log("Appending image to FormData:", formData.image);
         productFormData.append("image", formData.image)
+      } else {
+        console.log("No image to append to FormData");
       }
 
       if (selectedProduct) {
+        console.log("Updating existing product:", selectedProduct.id);
         // Update existing product
-        await updateProduct(selectedProduct.id, productFormData)
+        const response = await updateProduct(selectedProduct.id, productFormData)
+        console.log("Update product response:", response);
         toast.success("Product updated successfully")
       } else {
+        console.log("Creating new product");
         // Create new product
-        await addProduct(productFormData)
+        const response = await addProduct(productFormData)
+        console.log("Create product response:", response);
         toast.success("Product created successfully")
       }
 

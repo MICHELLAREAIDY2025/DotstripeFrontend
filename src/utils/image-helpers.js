@@ -4,32 +4,40 @@
  * @returns {string|null} - A valid image URL or a placeholder
  */
 export const parseProductImage = (imageUrl) => {
+  console.log("Parsing image URL:", imageUrl);
+
   // If no image is provided, return a placeholder
   if (!imageUrl || imageUrl === "") {
+    console.log("No image URL provided, using placeholder");
     return "/images/product-placeholder.png"
   }
 
   // Handle Supabase storage URLs
   if (typeof imageUrl === "string" && imageUrl.includes("supabase.co/storage")) {
+    console.log("Detected Supabase storage URL:", imageUrl);
     return imageUrl
   }
 
   // If the image is already a full URL, return it
   if (typeof imageUrl === "string" && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))) {
+    console.log("Detected full URL:", imageUrl);
     return imageUrl
   }
 
   // If it's a relative path, make sure it's properly formatted
   if (typeof imageUrl === "string" && imageUrl.startsWith("/")) {
+    console.log("Detected relative path:", imageUrl);
     return imageUrl
   }
 
   // If it's a base64 string, return it as is
   if (typeof imageUrl === "string" && imageUrl.startsWith("data:image")) {
+    console.log("Detected base64 image");
     return imageUrl
   }
 
   // Otherwise, assume it's a relative path and add the leading slash
+  console.log("Using default path handling");
   return typeof imageUrl === "string" ? `/${imageUrl}` : "/images/product-placeholder.png"
 }
 

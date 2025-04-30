@@ -39,23 +39,47 @@ export const ProductProvider = ({ children }) => {
 
   const addProduct = async (productData) => {
     try {
-      await createProduct(productData)
+      // Check if category_id is valid
+      if (!productData.get("category_id") && productData.category_id) {
+        // If using a regular object, ensure category_id is included
+        console.log("[ProductContext] Using category_id from object:", productData.category_id)
+      } else if (productData instanceof FormData) {
+        // If using FormData, log the category_id
+        console.log("[ProductContext] Using category_id from FormData:", productData.get("category_id"))
+
+        // Ensure category_id is a string (not an object)
+        const categoryId = productData.get("category_id")
+        if (categoryId && typeof categoryId === "object") {
+          productData.delete("category_id")
+          productData.append("category_id", String(categoryId))
+        }
+      }
+
+      const result = await createProduct(productData)
+      console.log("[ProductContext] Product created successfully:", result)
       toast.success("Product created successfully")
       fetchProducts()
+      return result
     } catch (err) {
       console.error("[ProductContext] Failed to create product:", err)
-      toast.error("Failed to create product")
+      // Show more detailed error message
+      const errorMessage = err.response?.data?.message || err.message || "Failed to create product"
+      toast.error(errorMessage)
+      throw err
     }
   }
 
   const updateProduct = async (id, productData) => {
     try {
-      await updateProductAPI(id, productData)
+      const result = await updateProductAPI(id, productData)
       toast.success("Product updated successfully")
       fetchProducts()
+      return result
     } catch (err) {
       console.error("[ProductContext] Failed to update product:", err)
-      toast.error("Failed to update product")
+      const errorMessage = err.response?.data?.message || err.message || "Failed to update product"
+      toast.error(errorMessage)
+      throw err
     }
   }
 

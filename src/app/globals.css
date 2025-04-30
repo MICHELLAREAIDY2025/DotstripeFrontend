@@ -38,6 +38,9 @@ body {
   .animate-spin-slow {
     animation: spin 20s linear infinite;
   }
+  .animate-fade-in-up {
+    animation: fade-in-up 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
 }
 
 @keyframes spin {
@@ -46,5 +49,16 @@ body {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

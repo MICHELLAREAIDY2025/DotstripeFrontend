@@ -6,9 +6,10 @@ import { toast } from "react-toastify"
 
 const ProductContext = createContext()
 
-export const ProductProvider = ({ children }) => {
+export function ProductProvider({ children }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const fetchProducts = async () => {
     console.log("[ProductContext] Fetching products...")
@@ -32,6 +33,7 @@ export const ProductProvider = ({ children }) => {
       console.error("[ProductContext] Failed to fetch products:", err)
       toast.error("Failed to fetch products")
       setProducts([])
+      setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -104,6 +106,7 @@ export const ProductProvider = ({ children }) => {
       value={{
         products,
         loading,
+        error,
         fetchProducts,
         addProduct,
         updateProduct,
@@ -115,4 +118,10 @@ export const ProductProvider = ({ children }) => {
   )
 }
 
-export const useProducts = () => useContext(ProductContext)
+export function useProducts() {
+  const context = useContext(ProductContext)
+  if (context === undefined) {
+    throw new Error("useProducts must be used within a ProductProvider")
+  }
+  return context
+}

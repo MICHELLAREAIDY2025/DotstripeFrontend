@@ -5,7 +5,7 @@ import axios from "axios"
 import Link from "next/link"
 import { Minus, Plus, X, ShoppingBag, Trash2 } from "lucide-react"
 import { useAuth } from "@/app/context/AuthContext"
-import { useCart } from "@/app/context/Cartcontext"
+import { useCart } from "../context/CartContext"
 
 
 export default function CartPopup({ isOpen, onClose }) {

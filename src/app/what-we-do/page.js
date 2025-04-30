@@ -94,6 +94,33 @@ export default function WhatWeDo() {
           ))}
         </div>
 
+        {/* Check Our Products Section */}
+        <div className="text-center mb-32">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
+              Discover Our Latest Products
+            </h2>
+            <p className="text-gray-300 mb-8">
+              Explore our wide range of cutting-edge technology products and solutions tailored to meet your business needs.
+            </p>
+            <Link
+              href="/products"
+              className="inline-flex items-center bg-[#18608C] text-white px-8 py-4 rounded-lg hover:bg-[#17A0BF] transition-all duration-300 transform hover:scale-105 group"
+            >
+              <span className="text-lg font-semibold">Check Our Products</span>
+              <svg
+                className="w-5 h-5 ml-2 transition-transform duration-300 transform group-hover:translate-x-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
         {/* Service Details Modal */}
         {openService && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">

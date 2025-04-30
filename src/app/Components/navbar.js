@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useAuth } from "@/app/context/AuthContext"
-import { useCart } from "@/app/context/Cartcontext"
+import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"

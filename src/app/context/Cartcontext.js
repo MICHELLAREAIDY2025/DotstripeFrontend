@@ -3,8 +3,16 @@
 import { createContext, useContext, useState, useEffect } from "react"
 import axios from "axios"
 import { useAuth } from "@/app/context/AuthContext";
+import { useProducts } from "@/app/context/ProductContext"
 
 const CartContext = createContext()
+
+function attachProductsToCartItems(cartItems, products) {
+  return cartItems.map(item => ({
+    ...item,
+    Product: products.find(p => p.id === item.product_id) || item.Product || {},
+  }))
+}
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([])
@@ -12,6 +20,7 @@ export function CartProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { user, loading: authLoading } = useAuth()
+  const { products } = useProducts()
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen)
@@ -41,7 +50,7 @@ export function CartProvider({ children }) {
       // Calculate cart count
       const count = response.data.reduce((sum, item) => sum + item.quantity, 0)
       setCartCount(count)
-      setCartItems(response.data)
+      setCartItems(attachProductsToCartItems(response.data, products))
     } catch (err) {
       console.error("Error fetching cart:", err)
         // If we get a 401, clear the cart as the user is not authenticated
@@ -68,24 +77,7 @@ export function CartProvider({ children }) {
       return false
     }
     try {
-        // Update local state immediately for better UX
-        setCartCount((prevCount) => prevCount + quantity)
-
-        // Find if the item already exists in the cart
-        const existingItem = cartItems.find((item) => item.product_id === productId)
-  
-        if (existingItem) {
-          // If item exists, update its quantity
-          setCartItems((prevItems) =>
-            prevItems.map((item) =>
-              item.product_id === productId ? { ...item, quantity: item.quantity + quantity } : item,
-            ),
-          )
-        } else {
-          // If item doesn't exist, add it to the cart
-          setCartItems((prevItems) => [...prevItems, { product_id: productId, quantity }])
-        }
-      await axios.post(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/cart`,
         {
           product_id: productId,
@@ -96,8 +88,35 @@ export function CartProvider({ children }) {
         },
       )
 
-      // Refresh cart after adding
-      fetchCart()
+      if (response.data) {
+        const productResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`,
+          { withCredentials: true }
+        )
+
+        const newItem = {
+          ...response.data,
+          Product: productResponse.data
+        }
+
+        setCartCount((prevCount) => prevCount + quantity)
+        const existingItem = cartItems.find((item) => item.product_id === productId)
+
+        if (existingItem) {
+          setCartItems((prevItems) => attachProductsToCartItems(
+            prevItems.map((item) =>
+              item.product_id === productId
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            ),
+            products
+          ))
+        } else {
+          setCartItems((prevItems) => attachProductsToCartItems([...prevItems, newItem], products))
+        }
+        setIsCartOpen(true)
+      }
+
       return true
     } catch (err) {
       console.error("Error adding to cart:", err)
@@ -105,35 +124,32 @@ export function CartProvider({ children }) {
     }
   }
 
-  const updateCartItem = async (productId, quantity) => {
+  const updateCartItem = async (cartItemId, quantity) => {
     if (!user) return false
     try {
-        // Find the current item to calculate the difference
-        const currentItem = cartItems.find((item) => item.product_id === productId)
-
-        if (currentItem) {
-          const quantityDifference = quantity - currentItem.quantity
-  
-          // Update cart count immediately for better UX
-          setCartCount((prevCount) => prevCount + quantityDifference)
-  
-          // Update local cart items for immediate feedback
-          setCartItems((prevItems) =>
-            prevItems.map((item) => (item.product_id === productId ? { ...item, quantity } : item)),
-          )
-        }
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`,
-        {
-          quantity,
-        },
-        {
-          withCredentials: true,
-        },
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${cartItemId}`,
+        { quantity },
+        { withCredentials: true }
       )
-
-      // Refresh cart after updating
-      fetchCart()
+      // Use the backend response to update local state
+      if (response.data) {
+        setCartItems((prevItems) => attachProductsToCartItems(
+          prevItems.map((item) =>
+            item.id === cartItemId
+              ? { ...item, quantity: response.data.quantity }
+              : item
+          ),
+          products
+        ))
+        // Update cart count
+        setCartCount((prevItems => {
+          const newCount = response.data.quantity +
+            prevItems.filter((item) => item.id !== cartItemId)
+              .reduce((sum, item) => sum + item.quantity, 0)
+          return newCount
+        })(cartItems))
+      }
       return true
     } catch (err) {
       console.error("Error updating cart item:", err)
@@ -141,25 +157,22 @@ export function CartProvider({ children }) {
     }
   }
 
-  const removeCartItem = async (productId) => {
+  const removeCartItem = async (cartItemId) => {
     if (!user) return false
     try {
-       // Find the current item to subtract from count
-       const currentItem = cartItems.find((item) => item.product_id === productId)
+       const currentItem = cartItems.find((item) => item.id === cartItemId)
 
        if (currentItem) {
-         // Update cart count immediately for better UX
          setCartCount((prevCount) => prevCount - currentItem.quantity)
- 
-         // Update local cart items for immediate feedback
-         setCartItems((prevItems) => prevItems.filter((item) => item.product_id !== productId))
+         setCartItems((prevItems) => attachProductsToCartItems(
+           prevItems.filter((item) => item.id !== cartItemId),
+           products
+         ))
        }
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${productId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${cartItemId}`, {
         withCredentials: true,
       })
-
-      // Refresh cart after removing
-      fetchCart()
+      // Removed fetchCart() here for smoother UX
       return true
     } catch (err) {
       console.error("Error removing cart item:", err)

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useAuth } from "../context/AuthContext"
-import { useCart } from "../context/CartContext"
+import { useCart } from "../context/Cartcontext"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"

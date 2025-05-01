@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useAuth } from "./context/AuthContext"
-import { useCart } from "./context/CartContext"
+import { useCart } from "./context/Cartcontext"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import Navbar from "@/app/Components/navbar"
@@ -12,16 +11,7 @@ import Footer from "@/app/Components/footer"
 
 export default function Home() {
   const { user } = useAuth()
-  const { setCartCount } = useCart()
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
+  const { setCartCount, cartItems } = useCart()
 
   return (
     <div className="min-h-screen bg-[#031626] flex flex-col">

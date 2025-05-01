@@ -2,7 +2,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ProductProvider } from "./context/ProductContext"
 import { AuthProvider } from "./context/AuthContext"
-import { CartProvider } from "./context/CartContext"
+import { CartProvider } from "./context/Cartcontext"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
@@ -18,8 +18,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <CartProvider>
-            <ProductProvider>
+          <ProductProvider>
+            <CartProvider>
               {children}
               <ToastContainer
                 position="top-right"
@@ -33,8 +33,8 @@ export default function RootLayout({ children }) {
                 pauseOnHover
                 theme="dark"
               />
-            </ProductProvider>
-          </CartProvider>
+            </CartProvider>
+          </ProductProvider>
         </AuthProvider>
       </body>
     </html>

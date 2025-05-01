@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useProducts } from "@/app/context/ProductContext"
-import { useCart } from "@/app/context/CartContext"
+import { useCart } from "@/app/context/Cartcontext"
+import { useAuth } from "@/app/context/AuthContext"
 import { motion } from "framer-motion"
 import Navbar from "@/app/Components/navbar"
 import Footer from "@/app/Components/footer"
@@ -12,8 +14,10 @@ import { ShoppingCart, Info, Plus, Minus } from "lucide-react"
 import { toast } from "react-toastify"
 
 export default function ProductsPage() {
+  const router = useRouter()
   const { products, loading, error } = useProducts()
-  const { addToCart } = useCart()
+  const { addToCart, toggleCart } = useCart()
+  const { user } = useAuth()
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [categories, setCategories] = useState([])
   const [latestProducts, setLatestProducts] = useState([])
@@ -21,11 +25,13 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
+  const [modalMode, setModalMode] = useState("info") // 'info' or 'cart'
   const productsPerPage = 9
 
   useEffect(() => {
     if (!selectedProduct) {
       setQuantity(1)
+      setModalMode("info")
     }
   }, [selectedProduct])
 
@@ -58,12 +64,18 @@ export default function ProductsPage() {
   const totalPages = Math.ceil((filteredProducts?.length || 0) / productsPerPage)
 
   const handleAddToCart = async (product, qty = 1) => {
+    if (!user) {
+      toast.info("Please login to add items to cart")
+      router.push("/login")
+      return
+    }
+
     try {
       await addToCart(product.id, qty)
       toast.success(`${qty} ${product.name}${qty > 1 ? 's' : ''} added to cart!`)
-      if (selectedProduct) {
-        setSelectedProduct(null)
-      }
+      setSelectedProduct(null)
+      setModalMode("info")
+      toggleCart() // open cart popup
     } catch (error) {
       toast.error("Failed to add product to cart")
     }
@@ -88,14 +100,20 @@ export default function ProductsPage() {
           <span className="text-[#18608C] font-bold text-xl">${product.price}</span>
           <div className="flex gap-2">
             <button
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => {
+                setSelectedProduct(product)
+                setModalMode("info")
+              }}
               className="bg-gray-200 text-gray-700 p-2 rounded-md hover:bg-gray-300 transition-colors duration-300"
               title="View Details"
             >
               <Info size={20} />
             </button>
             <button
-              onClick={() => handleAddToCart(product)}
+              onClick={() => {
+                setSelectedProduct(product)
+                setModalMode("cart")
+              }}
               className="bg-[#18608C] text-white p-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
               title="Add to Cart"
             >
@@ -315,31 +333,33 @@ export default function ProductsPage() {
                       <span className="text-[#18608C] font-bold text-2xl">
                         ${selectedProduct.price}
                       </span>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-gray-100 rounded-md">
+                      {modalMode === "cart" && (
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2 bg-gray-100 rounded-md">
+                            <button
+                              onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                              className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
+                              disabled={quantity <= 1}
+                            >
+                              <Minus size={16} />
+                            </button>
+                            <span className="w-8 text-center font-medium">{quantity}</span>
+                            <button
+                              onClick={() => setQuantity(prev => prev + 1)}
+                              className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
                           <button
-                            onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
-                            className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
-                            disabled={quantity <= 1}
+                            onClick={() => handleAddToCart(selectedProduct, quantity)}
+                            className="bg-[#18608C] text-white px-4 py-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300 flex items-center gap-2"
                           >
-                            <Minus size={16} />
-                          </button>
-                          <span className="w-8 text-center font-medium">{quantity}</span>
-                          <button
-                            onClick={() => setQuantity(prev => prev + 1)}
-                            className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
-                          >
-                            <Plus size={16} />
+                            <ShoppingCart size={20} />
+                            Add to Cart
                           </button>
                         </div>
-                        <button
-                          onClick={() => handleAddToCart(selectedProduct, quantity)}
-                          className="bg-[#18608C] text-white px-4 py-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300 flex items-center gap-2"
-                        >
-                          <ShoppingCart size={20} />
-                          Add to Cart
-                        </button>
-                      </div>
+                      )}
                     </div>
                     {selectedProduct.category && (
                       <p className="text-sm text-gray-500">

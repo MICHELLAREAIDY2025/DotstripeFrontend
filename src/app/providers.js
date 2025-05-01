@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { AuthProvider } from "./context/AuthContext"
-import { CartProvider } from "./context/CartContext"
+import { CartProvider } from "./context/Cartcontext"
 import { ProductProvider } from "./context/ProductContext"
 import { useState } from "react"
 

@@ -25,7 +25,7 @@ const Footer = () => {
 
           {/* Copyright Section */}
           <div className="flex items-center justify-center">
-            <p className="text-gray-400 text-sm text-center">Copywrite© Dot Stripe 2024</p>
+            <p className="text-gray-400 text-sm text-center">© 2025 Dot Stripe. All rights reserved.</p>
           </div>
 
           {/* Location Section */}
@@ -34,19 +34,6 @@ const Footer = () => {
             <p className="text-gray-300 md:text-right text-base">Beirut, Lebanon</p>
             <p className="text-gray-300 md:text-right text-base">75008 Paris</p>
             <p className="text-gray-300 md:text-right text-base">FRANCE</p>
-          </div>
-        </div>
-
-        {/* Bottom Links - Optional */}
-        <div className="mt-6 pt-4 border-t border-gray-700/30 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-          <div className="text-xs text-gray-500">© {new Date().getFullYear()} Dot Stripe. All rights reserved.</div>
-          <div className="flex space-x-4">
-            <Link href="/privacy" className="text-xs text-gray-400 hover:text-white transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-xs text-gray-400 hover:text-white transition-colors">
-              Terms of Service
-            </Link>
           </div>
         </div>
       </div>

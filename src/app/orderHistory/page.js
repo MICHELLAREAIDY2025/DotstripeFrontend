@@ -128,72 +128,70 @@ const OrdersHistory = () => {
     }
   }, [orderItems]);
 
-  if (loading) return <div className="text-center text-xl">Loading...</div>;
+  if (loading) return <div className="text-center text-xl text-white">Loading...</div>;
 
   return (
-    <div className="px-6 py-12 bg-gray-100">
+    <div className="px-6 py-12 bg-[#031626]">
       <Header />
-      <div className="bg-[#A68F7B] h-[20vh] flex items-center justify-center mt-20">
+      <div className="bg-[#18608C] h-[20vh] flex items-center justify-center mt-20">
         <h1 className="text-white text-5xl sm:text-6xl font-bold text-center">Orders History</h1>
       </div>
       {error && <div className="text-red-500 text-center">{error}</div>}
 
       {/* Date Range Filter */}
       <div className="flex justify-center items-center flex-wrap gap-4 mb-6 mt-6">
-  <label className="flex flex-col text-sm text-gray-700">
-    Start Date
-    <input
-      type="date"
-      value={startDate}
-      onChange={(e) => setStartDate(e.target.value)}
-      className="p-2 border border-gray-300 rounded-md mt-1"
-    />
-  </label>
+        <label className="flex flex-col text-sm text-white">
+          Start Date
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md mt-1 bg-[#18608C] text-white"
+          />
+        </label>
 
-  <label className="flex flex-col text-sm text-gray-700">
-    End Date
-    <input
-      type="date"
-      value={endDate}
-      onChange={(e) => setEndDate(e.target.value)}
-      className="p-2 border border-gray-300 rounded-md mt-1"
-    />
-  </label>
+        <label className="flex flex-col text-sm text-white">
+          End Date
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md mt-1 bg-[#18608C] text-white"
+          />
+        </label>
 
-  {/* Search Button */}
-  <button
-    onClick={handleSearch}
-    disabled={!startDate && !endDate}
-    className={`px-4 py-2 rounded-md text-white mt-6 ${startDate || endDate ? "bg-[#4A8C8C] hover:bg-[#357474]" : "bg-gray-400 cursor-not-allowed"}`}
-  >
-    Search
-  </button>
+        {/* Search Button */}
+        <button
+          onClick={handleSearch}
+          disabled={!startDate && !endDate}
+          className={`px-4 py-2 rounded-md text-white mt-6 ${startDate || endDate ? "bg-[#18608C] hover:bg-[#17A0BF]" : "bg-gray-400 cursor-not-allowed"}`}
+        >
+          Search
+        </button>
 
-  {/* Clear Filter Button */}
-  {(startDate || endDate) && (
-    <button
-      onClick={() => {
-        setStartDate("");
-        setEndDate("");
-        setFilteredOrders(orders);
-      }}
-      className="px-4 py-2 bg-red-500 text-white rounded-md mt-6"
-    >
-      Clear
-    </button>
-  )}
-</div>
-
-
+        {/* Clear Filter Button */}
+        {(startDate || endDate) && (
+          <button
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+              setFilteredOrders(orders);
+            }}
+            className="px-4 py-2 bg-red-500 text-white rounded-md mt-6"
+          >
+            Clear
+          </button>
+        )}
+      </div>
 
       {/* Orders List (Now Uses `filteredOrders`) */}
       <div className="max-w-4xl mx-auto space-y-6">
         {filteredOrders.length === 0 ? (
-          <p className="text-center text-gray-600">No orders found</p>
+          <p className="text-center text-white">No orders found</p>
         ) : (
           filteredOrders.map((order) => (
-            <div key={order.id} className="bg-white p-4 rounded-lg shadow-md mb-4">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            <div key={order.id} className="bg-[#18608C] p-4 rounded-lg shadow-md mb-4">
+              <h2 className="text-xl font-semibold text-white mb-2">
                 Order ID: {order.id} - {order.status}
               </h2>
 

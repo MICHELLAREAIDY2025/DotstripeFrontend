@@ -55,12 +55,12 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
-            <div className="relative h-16 w-40 md:h-20 md:w-48">
+            <div className="relative h-24 w-56 md:h-28 md:w-64 flex items-center">
               <Image
                 src="/images/DotStripeLogo.png"
                 alt="Dot Stripe Logo"
-                width={200}
-                height={80}
+                width={256}
+                height={100}
                 className="object-contain"
                 priority
               />

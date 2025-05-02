@@ -11,16 +11,24 @@ export default function CartPopup({ isOpen, onClose }) {
   const { cartItems, cartCount, updateCartItem, removeCartItem, clearCart } = useCart()
 
   // Update quantity
-  const handleQuantityUpdate = async (cartItemId, newQuantity) => {
-    if (newQuantity < 1) return
-    const item = cartItems.find((item) => item.id === cartItemId)
-    const stock = item?.Product?.stock ?? 0
-    if (newQuantity > stock) {
-      toast.error(`Only ${stock} item(s) available in stock.`)
+  const handleQuantityUpdate = async (cartItemId, newQuantity, stock) => {
+    if (newQuantity < 1) {
+      toast.error("Quantity cannot be less than 1")
       return
     }
-    const success = await updateCartItem(cartItemId, newQuantity)
-    if (!success) {
+    
+    if (newQuantity > stock) {
+      toast.error(`Only ${stock} item(s) available in stock`)
+      return
+    }
+
+    try {
+      const success = await updateCartItem(cartItemId, newQuantity)
+      if (!success) {
+        toast.error("Failed to update quantity. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error)
       toast.error("Failed to update quantity. Please try again.")
     }
   }
@@ -120,21 +128,25 @@ export default function CartPopup({ isOpen, onClose }) {
                               )}
                             </div>
                             <div className="flex-1 flex items-end justify-between text-sm">
-                              <div className="flex items-center border rounded-md">
-                                <button
-                                  onClick={() => handleQuantityUpdate(item.id, item.quantity - 1)}
-                                  className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                                  disabled={item.quantity <= 1}
-                                >
-                                  <Minus size={14} />
-                                </button>
-                                <span className="px-2 py-1">{item.quantity}</span>
-                                <button
-                                  onClick={() => handleQuantityUpdate(item.id, item.quantity + 1)}
-                                  className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                                >
-                                  <Plus size={14} />
-                                </button>
+                              <div className="flex items-center">
+                                <p className="text-gray-500 mr-4">{item.Product?.stock || 0} available</p>
+                                <div className="flex items-center border rounded-md">
+                                  <button
+                                    onClick={() => handleQuantityUpdate(item.id, item.quantity - 1, item.Product?.stock)}
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={item.quantity <= 1}
+                                  >
+                                    <Minus size={14} />
+                                  </button>
+                                  <span className="px-4 py-1 min-w-[40px] text-center">{item.quantity}</span>
+                                  <button
+                                    onClick={() => handleQuantityUpdate(item.id, item.quantity + 1, item.Product?.stock)}
+                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={item.quantity >= (item.Product?.stock || 0)}
+                                  >
+                                    <Plus size={14} />
+                                  </button>
+                                </div>
                               </div>
                               <div className="flex">
                                 <button

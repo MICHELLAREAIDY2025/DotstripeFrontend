@@ -179,7 +179,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-[#031626] flex flex-col">
       <Navbar />
-      <main className="flex-1 py-16 px-4">
+      <main className="flex-1 pt-32 md:pt-36 pb-12 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Hero Section */}
           <motion.div 
@@ -188,10 +188,14 @@ export default function ProductsPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Our Products
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-8">
+              Preparing For Your Success, We<br />
+              <span className="block mt-2">Provide Truly IT Solutions.</span>
             </h1>
-            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Our Products
+            </h2>
+            <p className="text-gray-300 text-xl md:text-2xl max-w-2xl mx-auto">
               Discover our comprehensive range of technology solutions designed to elevate your business.
             </p>
           </motion.div>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
 import { ToastContainer } from "react-toastify"
-import { useCart } from "../context/CartContext"
+import { useCart } from "@/app/context/Cartcontext"
 import "react-toastify/dist/ReactToastify.css"
 
 import { fetchCheckoutData } from "./checkout/utils/api"

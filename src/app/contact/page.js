@@ -87,13 +87,9 @@ export default function ContactPage() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left side - Image and text */}
-            <div className="relative">
-              <div className="relative rounded-lg overflow-hidden shadow-2xl h-[400px] md:h-[500px]">
-                <Image src="/images/consulting-team.jpg" alt="Consulting Team" fill className="object-cover" priority />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#031626]/90 to-[#031626]/40 flex flex-col justify-end p-8 md:p-10">
-                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4">CONSULTING</h1>
-                  <p className="text-xl text-white/90">Let's have a discussion</p>
-                </div>
+            <div className="flex justify-center items-center">
+              <div className="relative w-[300px] h-[300px] md:w-[400px] md:h-[400px] rounded-full overflow-hidden shadow-2xl mx-auto">
+                <Image src="/images/contact.jpg" alt="Contact" fill className="object-cover rounded-full" priority />
               </div>
             </div>
 

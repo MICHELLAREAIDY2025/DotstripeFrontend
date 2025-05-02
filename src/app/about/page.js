@@ -48,21 +48,16 @@ export default function AboutPage() {
             }`}
           >
             {/* Text Content - Takes 7/12 of the width on desktop */}
-            <div className="lg:col-span-7 text-white">
-              <h1 className="text-3xl md:text-4xl font-bold mb-10 text-center lg:text-left">Who We Are</h1>
-
-              <div className="text-sm md:text-base lg:text-lg leading-relaxed space-y-6">
+            <div className="lg:col-span-7 text-white flex flex-col justify-center h-full md:min-h-[420px]">
+              <h1 className="text-5xl md:text-6xl font-extrabold mb-8 text-center lg:text-left">Who We Are</h1>
+              <div className="text-xl md:text-2xl leading-relaxed space-y-6">
                 <p>
-                  FOUNDED IN 2009, DOT STRIPE ASSISTS BUSINESSES PROFIT ON THE GROWTH AND POTENTIAL OF INFORMATION
-                  TECHNOLOGY.
+                  FOUNDED IN 2009, DOT STRIPE ASSISTS BUSINESSES PROFIT ON THE GROWTH AND POTENTIAL OF INFORMATION TECHNOLOGY.
                 </p>
-
                 <p>
-                  OUR DIFFERENTIATED INTEGRATED APPROACH AND THE KNOWLEDGE OF LEADING EDGE TECHNOLOGY GRANT US THE
-                  ADVANTAGE IN PROVIDING YOU WITH STATE OF THE ART PRODUCTS.
+                  OUR DIFFERENTIATED INTEGRATED APPROACH AND THE KNOWLEDGE OF LEADING EDGE TECHNOLOGY GRANT US THE ADVANTAGE IN PROVIDING YOU WITH STATE OF THE ART PRODUCTS.
                 </p>
               </div>
-
               <div className="mt-8">
                 <button
                   onClick={togglePopup}
@@ -75,14 +70,14 @@ export default function AboutPage() {
             </div>
 
             {/* Image - Takes 5/12 of the width on desktop */}
-            <div className="lg:col-span-5">
-              <div className="relative w-full h-64 md:h-80 lg:h-[450px] rounded-lg overflow-hidden shadow-2xl transform transition-all duration-500 hover:scale-[1.02]">
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="relative w-[340px] h-[340px] md:w-[420px] md:h-[420px] rounded-full overflow-hidden shadow-2xl mx-auto transform transition-all duration-500 hover:scale-[1.02]">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#031626]/80 to-transparent z-10"></div>
                 <Image
                   src="/images/tech-office.png"
                   alt="Dot Stripe Technology Solutions"
                   fill
-                  className="object-cover"
+                  className="object-cover rounded-full"
                   priority
                 />
               </div>
@@ -98,41 +93,34 @@ export default function AboutPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {/* Feature 1 */}
-            <div className="bg-[#0A2235] p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-5px]">
-              <div className="flex items-center mb-4">
-                <div className="bg-[#17A0BF]/20 p-3 rounded-full mr-4">
-                  <CheckCircle className="h-6 w-6 text-[#17A0BF]" />
-                </div>
-                <h3 className="text-xl font-semibold text-white">Innovative Solutions</h3>
+            <div className="bg-[#0A2235] p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] flex flex-col items-center text-center">
+              <div className="bg-[#17A0BF]/20 p-4 rounded-full mb-4 flex items-center justify-center">
+                <CheckCircle className="h-8 w-8 text-[#17A0BF]" />
               </div>
-              <p className="text-gray-300">
-                We leverage cutting-edge technology to deliver innovative solutions that drive business growth and
-                efficiency.
+              <h3 className="text-2xl font-bold text-white mb-2">Innovative Solutions</h3>
+              <p className="text-gray-300 text-lg">
+                We leverage cutting-edge technology to deliver innovative solutions that drive business growth and efficiency.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-[#0A2235] p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-5px]">
-              <div className="flex items-center mb-4">
-                <div className="bg-[#17A0BF]/20 p-3 rounded-full mr-4">
-                  <CheckCircle className="h-6 w-6 text-[#17A0BF]" />
-                </div>
-                <h3 className="text-xl font-semibold text-white">Global Reach</h3>
+            <div className="bg-[#0A2235] p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] flex flex-col items-center text-center">
+              <div className="bg-[#17A0BF]/20 p-4 rounded-full mb-4 flex items-center justify-center">
+                <CheckCircle className="h-8 w-8 text-[#17A0BF]" />
               </div>
-              <p className="text-gray-300">
+              <h3 className="text-2xl font-bold text-white mb-2">Global Reach</h3>
+              <p className="text-gray-300 text-lg">
                 With operations in Lebanon and France, we provide IT services and solutions to clients worldwide.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-[#0A2235] p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-5px]">
-              <div className="flex items-center mb-4">
-                <div className="bg-[#17A0BF]/20 p-3 rounded-full mr-4">
-                  <CheckCircle className="h-6 w-6 text-[#17A0BF]" />
-                </div>
-                <h3 className="text-xl font-semibold text-white">Customer Focus</h3>
+            <div className="bg-[#0A2235] p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] flex flex-col items-center text-center">
+              <div className="bg-[#17A0BF]/20 p-4 rounded-full mb-4 flex items-center justify-center">
+                <CheckCircle className="h-8 w-8 text-[#17A0BF]" />
               </div>
-              <p className="text-gray-300">
+              <h3 className="text-2xl font-bold text-white mb-2">Customer Focus</h3>
+              <p className="text-gray-300 text-lg">
                 We prioritize understanding your unique business needs to deliver customized technology solutions.
               </p>
             </div>

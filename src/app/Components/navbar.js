@@ -79,23 +79,23 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex text-base lg:text-lg font-medium text-white">
-          <ul className="flex items-center space-x-8 lg:space-x-12">
-            <li>
+          <ul className="flex items-center h-full space-x-8 lg:space-x-12">
+            <li className="flex items-center">
               <Link href="/what-we-do" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 What we do
               </Link>
             </li>
-            <li>
+            <li className="flex items-center">
               <Link href="/what-we-think" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 What we think
               </Link>
             </li>
-            <li>
+            <li className="flex items-center">
               <Link href="/about" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 Who we are
               </Link>
             </li>
-            <li>
+            <li className="flex items-center">
               <Link href="/contact" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 Contact
               </Link>

@@ -188,11 +188,7 @@ export default function ProductsPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-16"
           >
-            <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-8">
-              Preparing For Your Success, We<br />
-              <span className="block mt-2">Provide Truly IT Solutions.</span>
-            </h1>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
               Our Products
             </h2>
             <p className="text-gray-300 text-xl md:text-2xl max-w-2xl mx-auto">
@@ -250,15 +246,24 @@ export default function ProductsPage() {
             </div>
           </section>
 
-          {/* Filtered Products Grid */}
+          {/* All Products Horizontal Scroll */}
           <motion.section
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
+            className="flex gap-8 mb-12 overflow-x-auto scrollbar-thin scrollbar-thumb-[#18608C] scrollbar-track-[#031626] px-2"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+            onWheel={e => {
+              if (e.deltaY !== 0) {
+                e.currentTarget.scrollLeft += e.deltaY;
+                e.preventDefault();
+              }
+            }}
           >
             {currentProducts?.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div className="min-w-[320px] max-w-xs flex-shrink-0" key={product.id}>
+                <ProductCard product={product} />
+              </div>
             ))}
           </motion.section>
 

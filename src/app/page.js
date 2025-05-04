@@ -14,7 +14,12 @@ export default function Home() {
   const { setCartCount, cartItems } = useCart()
 
   return (
-    <div className="min-h-screen bg-[#031626] flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Background image */}
+      <div className="absolute inset-0 -z-10">
+        <Image src="/images/landing.jpg" alt="Landing Background" fill className="object-cover w-full h-full" priority />
+        <div className="absolute inset-0 bg-[#031626]/70" />
+      </div>
       <Navbar />
       <ToastContainer />
 
@@ -25,9 +30,6 @@ export default function Home() {
             <br />
             TO TECH EXCELLENCE...
           </h1>
-          <div className="relative w-full max-w-2xl h-48 md:h-64 lg:h-80 mx-auto mb-2">
-            <Image src="/images/future.jpg" alt="Future" fill className="object-contain" priority />
-          </div>
           <Link
             href={user ? "/what-we-do" : "/register"}
             className="inline-block bg-[#18608C] text-white py-3 px-12 rounded-md font-semibold hover:bg-[#17A0BF] transition duration-300 text-lg mt-2"

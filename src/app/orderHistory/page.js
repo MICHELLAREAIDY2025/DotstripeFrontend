@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { getUserOrders } from "../../lib/api";
 import Header from "../Components/navbar";
 import Footer from "../Components/footer";
 
@@ -18,13 +18,18 @@ const OrdersHistory = () => {
   // Fetch Orders for Logged-in User
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/my-orders`, { withCredentials: true });
-      console.log("Orders Fetched:", response.data);
-      setOrders(response.data);
-      setFilteredOrders(response.data); // Show all orders 
+      const orders = await getUserOrders();
+      console.log("Orders Fetched:", orders);
+      // Normalize id field for frontend rendering
+      const normalizedOrders = Array.isArray(orders)
+        ? orders.map(order => ({ ...order, id: order.id || order._id }))
+        : [];
+      setOrders(normalizedOrders);
+      setFilteredOrders(normalizedOrders); // Show all orders
     } catch (err) {
       console.error("Error fetching orders:", err);
       setError("Unable to fetch orders.");
+    } finally {
       setLoading(false);
     }
   };

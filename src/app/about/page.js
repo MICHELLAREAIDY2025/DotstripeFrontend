@@ -49,7 +49,7 @@ export default function AboutPage() {
           >
             {/* Text Content - Takes 7/12 of the width on desktop */}
             <div className="lg:col-span-7 text-white flex flex-col justify-center h-full md:min-h-[420px]">
-              <h1 className="text-5xl md:text-6xl font-extrabold mb-8 text-center lg:text-left">Who We Are</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center lg:text-left">Who We Are</h1>
               <div className="text-xl md:text-2xl leading-relaxed space-y-6">
                 <p>
                   FOUNDED IN 2009, DOT STRIPE ASSISTS BUSINESSES PROFIT ON THE GROWTH AND POTENTIAL OF INFORMATION TECHNOLOGY.

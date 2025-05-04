@@ -151,5 +151,8 @@ export const deleteOrderItem = (id) =>
       throw error
     })
 
+// Get orders for the logged-in user
+export const getUserOrders = () => API.get("/api/orders/user").then((res) => res.data)
+
 // Export the API instance for other uses
 export default API

@@ -7,40 +7,45 @@ import { validateAddress, validatePayment } from "./utils/validation"
 import { notify } from "./utils/toast"
 import PaymentForm from "./PaymentForm"
 import AddressForm from "./AddressForm"
+import { createOrder } from "../../../lib/api"
 
 export default function CheckoutForm({ paymentMethod, address, payment, updateState, updateAddress, updatePayment, placeOrder }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleCheckout = async () => {
-    try { 
+    try {
       if (!validateAddress(address)) return
- 
       if (paymentMethod === "paytab" && !validatePayment(payment)) return
-
       setIsSubmitting(true)
 
-      const payload = {
-        address,
-        paymentMethod,
-        ...(paymentMethod === "paytab"
-          ? {
-              payment: {
-                cardName: payment.cardName,
-                lastFour: payment.cardNumber.slice(-4),
-              },
-            }
-          : {}),
-      }
-
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, payload, {
-        withCredentials: true,
-      })
-
-      if (res.status === 201) {
-        // Call the checkout function to clear the cart
+      if (paymentMethod === "cod") {
+        // Use createOrder API helper for COD
+        const payload = {
+          address,
+          payment_method: "cash_on_delivery",
+        }
+        const order = await createOrder(payload)
         await placeOrder()
-        updateState({ orderPlaced: true, orderId: res.data.order_id })
+        updateState({ orderPlaced: true, orderId: order._id || order.id })
         notify("success", "Your order has been placed successfully!")
+      } else {
+        // Use old endpoint for paytab
+        const payload = {
+          address,
+          paymentMethod,
+          payment: {
+            cardName: payment.cardName,
+            lastFour: payment.cardNumber.slice(-4),
+          },
+        }
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, payload, {
+          withCredentials: true,
+        })
+        if (res.status === 201) {
+          await placeOrder()
+          updateState({ orderPlaced: true, orderId: res.data.order_id })
+          notify("success", "Your order has been placed successfully!")
+        }
       }
     } catch (err) {
       notify("error", err.response?.data?.error || "Failed to place your order. Please try again.")

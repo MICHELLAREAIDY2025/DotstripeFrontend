@@ -1,224 +1,173 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import Link from "next/link"
 import { useCart } from "../context/Cartcontext"
-import { useAuth } from "../context/AuthContext"
-import { useRouter } from "next/navigation"
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Button,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Image,
-  Input,
-  IconButton,
-  Flex,
-  Spinner,
-  useToast,
-  Badge,
-} from "@chakra-ui/react"
-import { DeleteIcon } from "@chakra-ui/icons"
+import Navbar from "@/app/Components/navbar"
+import Footer from "@/app/Components/footer"
+import { Minus, Plus, Trash2 } from "lucide-react"
+import { toast } from "react-toastify"
 
-export default function CartPage() {
-  const { cart, loading, updateCartItem, removeFromCart } = useCart()
-  const { isAuthenticated } = useAuth()
-  const router = useRouter()
-  const toast = useToast()
-  const [updating, setUpdating] = useState({})
+export default function Cart() {
+  const { cartItems, loading, updateCartItem, removeCartItem } = useCart()
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
+  // Handle quantity updates
+  const handleQuantityUpdate = async (cartItemId, newQuantity, stock) => {
+    if (newQuantity < 1) {
+      toast.error("Quantity cannot be less than 1")
+      return
     }
-  }, [isAuthenticated, router])
+    
+    if (newQuantity > stock) {
+      toast.error(`Only ${stock} item(s) available in stock`)
+      return
+    }
 
-  const handleQuantityChange = async (productId, newQuantity) => {
-    if (newQuantity < 1) return
-
-    setUpdating(prev => ({ ...prev, [productId]: true }))
     try {
-      await updateCartItem(productId, newQuantity)
+      const success = await updateCartItem(cartItemId, newQuantity)
+      if (!success) {
+        toast.error("Failed to update quantity. Please try again.")
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update quantity",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      })
-    } finally {
-      setUpdating(prev => ({ ...prev, [productId]: false }))
+      console.error("Error updating quantity:", error)
+      toast.error("Failed to update quantity. Please try again.")
     }
   }
 
-  const handleRemoveItem = async (productId) => {
+  // Handle item removal
+  const handleRemove = async (cartItemId) => {
     try {
-      await removeFromCart(productId)
-      toast({
-        title: "Success",
-        description: "Item removed from cart",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      })
+      const success = await removeCartItem(cartItemId)
+      if (!success) {
+        toast.error("Failed to remove item. Please try again.")
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to remove item",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      })
+      console.error("Error removing item:", error)
+      toast.error("Failed to remove item. Please try again.")
     }
-  }
-
-  const calculateTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0)
   }
 
   if (loading) {
     return (
-      <Container maxW="container.xl" py={8}>
-        <Flex justify="center" align="center" minH="60vh">
-          <Spinner size="xl" />
-        </Flex>
-      </Container>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading your cart...</div>
+      </div>
     )
   }
 
-  if (cart.length === 0) {
+  if (!cartItems || cartItems.length === 0) {
     return (
-      <Container maxW="container.xl" py={8}>
-        <Box textAlign="center" py={10}>
-          <Heading size="lg" mb={4}>
-            Your cart is empty
-          </Heading>
-          <Text mb={6}>Add some products to your cart to continue shopping</Text>
-          <Button colorScheme="blue" onClick={() => router.push("/products")}>
-            Browse Products
-          </Button>
-        </Box>
-      </Container>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 container mx-auto px-4 py-12">
+          <div className="mb-4">
+            <Link href="/products" className="inline-block text-[#18608C] hover:underline font-semibold">
+              &larr; Continue Shopping
+            </Link>
+          </div>
+          <h1 className="text-3xl font-bold mb-6 text-white">Your Cart</h1>
+          <div className="bg-white bg-opacity-10 rounded-lg p-8 text-center">
+            <p className="text-xl mb-4 text-white">Your cart is empty</p>
+            <Link href="/products">
+              <button className="bg-[#18608C] text-white px-6 py-3 rounded-md hover:bg-[#17A0BF] transition-colors duration-300">
+                Continue Shopping
+              </button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
     )
   }
+
+  // Calculate total
+  const total = cartItems.reduce((sum, item) => {
+    const price = item.Product?.price || 0
+    return sum + price * item.quantity
+  }, 0)
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <Heading size="lg" mb={6}>
-        Shopping Cart
-      </Heading>
-      <Box overflowX="auto">
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Product</Th>
-              <Th>Price</Th>
-              <Th>Quantity</Th>
-              <Th>Total</Th>
-              <Th>Stock</Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {cart.map((item) => (
-              <Tr key={item.product_id}>
-                <Td>
-                  <Flex align="center">
-                    <Image
-                      src={item.image_url}
-                      alt={item.name}
-                      boxSize="50px"
-                      objectFit="cover"
-                      mr={4}
-                    />
-                    <Box>
-                      <Text fontWeight="medium">{item.name}</Text>
-                      {item.stock <= 5 && (
-                        <Badge colorScheme="red" mt={1}>
-                          Only {item.stock} left in stock
-                        </Badge>
-                      )}
-                    </Box>
-                  </Flex>
-                </Td>
-                <Td>${item.price.toFixed(2)}</Td>
-                <Td>
-                  <Flex align="center">
-                    <IconButton
-                      icon="-"
-                      size="sm"
-                      onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}
-                      isDisabled={updating[item.product_id] || item.quantity <= 1}
-                    />
-                    <Input
-                      value={item.quantity}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value)
-                        if (!isNaN(value)) {
-                          handleQuantityChange(item.product_id, value)
-                        }
-                      }}
-                      w="60px"
-                      mx={2}
-                      textAlign="center"
-                      isDisabled={updating[item.product_id]}
-                    />
-                    <IconButton
-                      icon="+"
-                      size="sm"
-                      onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}
-                      isDisabled={updating[item.product_id] || item.quantity >= item.stock}
-                    />
-                  </Flex>
-                </Td>
-                <Td>${(item.price * item.quantity).toFixed(2)}</Td>
-                <Td>
-                  <Badge
-                    colorScheme={item.stock > 10 ? "green" : item.stock > 5 ? "yellow" : "red"}
-                  >
-                    {item.stock} in stock
-                  </Badge>
-                </Td>
-                <Td>
-                  <IconButton
-                    icon={<DeleteIcon />}
-                    colorScheme="red"
-                    variant="ghost"
-                    onClick={() => handleRemoveItem(item.product_id)}
-                  />
-                </Td>
-              </Tr>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-1 container mx-auto px-4 pt-40 md:pt-44 lg:pt-48 pb-8">
+        <div className="mb-4">
+          <Link href="/products" className="inline-block text-[#18608C] hover:underline font-semibold">
+            &larr; Continue Shopping
+          </Link>
+        </div>
+        <h1 className="text-3xl font-bold mb-6 text-gray-900">Your Cart</h1>
+
+        <div className="bg-white bg-opacity-10 rounded-lg p-6">
+          <div className="space-y-4">
+            {cartItems.map((item) => (
+              <div key={item.id} className="flex items-center justify-between border-b border-gray-200 pb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-gray-200 rounded-md overflow-hidden">
+                    {item.Product?.image_url && (
+                      <img
+                        src={item.Product.image_url}
+                        alt={item.Product.name || "Product"}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">{item.Product?.name || "Product"}</h3>
+                    <p className="text-sm text-gray-600">{item.Product?.category?.name || "Category"}</p>
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.Product?.description || "No description available"}</p>
+                    <p className="text-sm text-gray-600 mt-1">{item.Product?.stock || 0} available</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center gap-6">
+                    <div className="inline-flex items-center border border-gray-200 rounded-md bg-white h-8">
+                      <button
+                        onClick={() => handleQuantityUpdate(item.id, item.quantity - 1, item.Product?.stock)}
+                        className="h-full px-2 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={item.quantity <= 1}
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="h-full px-4 flex items-center justify-center min-w-[40px] text-center text-gray-900">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => handleQuantityUpdate(item.id, item.quantity + 1, item.Product?.stock)}
+                        className="h-full px-2 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={item.quantity >= (item.Product?.stock || 0)}
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                    <div className="font-medium text-gray-900 min-w-[80px] text-right">
+                      ${((item.Product?.price || 0) * item.quantity).toFixed(2)}
+                    </div>
+                    <button
+                      onClick={() => handleRemove(item.id)}
+                      className="text-red-500 hover:text-red-400 transition-colors p-1"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
             ))}
-          </Tbody>
-        </Table>
-      </Box>
-      <Flex justify="space-between" align="center" mt={8}>
-        <Button
-          variant="outline"
-          onClick={() => router.push("/products")}
-        >
-          Continue Shopping
-        </Button>
-        <Box textAlign="right">
-          <Text fontSize="xl" fontWeight="bold" mb={2}>
-            Total: ${calculateTotal().toFixed(2)}
-          </Text>
-          <Button
-            colorScheme="blue"
-            size="lg"
-            onClick={() => router.push("/checkout")}
-          >
-            Proceed to Checkout
-          </Button>
-        </Box>
-      </Flex>
-    </Container>
+          </div>
+
+          <div className="mt-6 flex justify-between items-center">
+            <div>
+              <p className="text-lg text-gray-900">
+                Total: <span className="font-bold">${total.toFixed(2)}</span>
+              </p>
+            </div>
+            <Link href="/checkout">
+              <button className="bg-[#18608C] text-white px-8 py-3 rounded-md hover:bg-[#17A0BF] transition-colors duration-300">
+                Proceed to Checkout
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
   )
 }

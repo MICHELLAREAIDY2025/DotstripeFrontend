@@ -243,9 +243,22 @@ const UsersPage = () => {
 
     try {
       if (typeof user.address === 'string') {
-        address = JSON.parse(user.address)
-      } else if (user.address) {
-        address = user.address
+        const parsedAddress = JSON.parse(user.address)
+        address = {
+          region: parsedAddress.region || "",
+          "address-direction": parsedAddress["address-direction"] || "",
+          phone: parsedAddress.phone || "",
+          building: parsedAddress.building || "",
+          floor: parsedAddress.floor || "",
+        }
+      } else if (user.address && typeof user.address === 'object') {
+        address = {
+          region: user.address.region || "",
+          "address-direction": user.address["address-direction"] || "",
+          phone: user.address.phone || "",
+          building: user.address.building || "",
+          floor: user.address.floor || "",
+        }
       }
     } catch (error) {
       console.error("Error parsing address:", error)
@@ -256,7 +269,7 @@ const UsersPage = () => {
       id: user.id,
       name: user.name || "",
       email: user.email || "",
-      password: "", // Keep password empty for security
+      password: "",
       address,
       role: user.role || "customer",
     })
@@ -279,7 +292,7 @@ const UsersPage = () => {
       return
     }
 
-    // Validate password only if it's being changed
+    // Validate password if it's being changed
     if (newUser.password) {
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/
       if (!passwordRegex.test(newUser.password)) {
@@ -314,7 +327,7 @@ const UsersPage = () => {
 
       // Only include password if it's being changed
       if (newUser.password) {
-        userData.newPassword = newUser.password
+        userData.password = newUser.password
       }
 
       // Log the formatted data being sent

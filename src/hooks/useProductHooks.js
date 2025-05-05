@@ -61,11 +61,39 @@ export const useUpdateProduct = () => {
       const response = await updateProduct(id, data)
       return response.data
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] })
+    onMutate: async ({ id, data }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["products"] })
+
+      // Snapshot the previous value
+      const previousProducts = queryClient.getQueryData(["products"])
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["products"], (old) => {
+        return old.map((product) => {
+          if (product.id === id) {
+            return {
+              ...product,
+              ...data,
+              // Keep the existing image_url if no new image is provided
+              image_url: data.image ? undefined : product.image_url,
+            }
+          }
+          return product
+        })
+      })
+
+      // Return a context object with the snapshotted value
+      return { previousProducts }
     },
-    onError: (error) => {
-      console.error("Error updating product:", error)
+    onError: (err, newProduct, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(["products"], context.previousProducts)
+      console.error("Error updating product:", err)
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure data consistency
+      queryClient.invalidateQueries({ queryKey: ["products"] })
     },
   })
 }

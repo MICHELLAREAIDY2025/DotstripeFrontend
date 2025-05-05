@@ -19,7 +19,7 @@ import BackButton from "./checkout/BackButton"
 
 export default function Checkout() {
   const { user } = useAuth()
-  const { checkout } = useCart() // Get checkout function from cart context
+  const { checkout } = useCart()
   const router = useRouter()
   const [state, setState] = useState({
     paymentMethod: "cod",
@@ -38,14 +38,18 @@ export default function Checkout() {
   const updatePayment = (newPayment) => updateState({ payment: { ...state.payment, ...newPayment } })
 
   useEffect(() => {
-    // No need to check for user here since the parent component already handles that
+    if (!user) {
+      notify("error", "Please log in to access checkout")
+      router.push("/login?redirect=/checkout")
+      return
+    }
+
     fetchCheckoutData()
-      .then(({ cartWithDetails, userAddress, shipping, isCartEmpty }) => {
+      .then(({ cartWithDetails, userAddress, shipping, isCartEmpty, orderSummary }) => {
         if (isCartEmpty) {
           return updateState({ isLoading: false, isCartEmpty: true })
         }
 
-        const subtotal = cartWithDetails.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0)
         updateState({
           cartItems: cartWithDetails,
           address: {
@@ -56,7 +60,7 @@ export default function Checkout() {
             building: userAddress.building || "",
             floor: userAddress.floor || "",
           },
-          orderSummary: { subtotal, shipping, total: subtotal + shipping },
+          orderSummary: orderSummary || { subtotal: 0, shipping: 0, total: 0 },
           isLoading: false,
         })
       })
@@ -65,18 +69,23 @@ export default function Checkout() {
         notify("error", err.response?.data?.error || "Failed to load checkout data. Please try again.")
         updateState({ isLoading: false })
       })
-  }, [])
-  // Add this function to your Checkout component
-     const placeOrder = async () => {
-        try {
-    // Call the checkout function to clear the cart
-        await checkout()
-        return true
-        } catch (error) {
-    console.error("Error clearing cart:", error)
+  }, [user, router])
+
+  const placeOrder = async () => {
+    try {
+      if (!user) {
+        notify("error", "Please log in to complete your checkout")
+        router.push("/login?redirect=/checkout")
         return false
+      }
+      await checkout()
+      return true
+    } catch (error) {
+      console.error("Error clearing cart:", error)
+      notify("error", "Failed to complete checkout. Please try again.")
+      return false
+    }
   }
-}
 
   // Conditional rendering based on state
   if (state.isLoading) return <LoadingState />
@@ -84,22 +93,35 @@ export default function Checkout() {
   if (state.orderPlaced) return <OrderConfirmation orderId={state.orderId} />
 
   return (
-    <div className="min-h-screen bg-[#f9f6f2] flex justify-center p-6">
-      <ToastContainer position="top-center" autoClose={5000} theme="colored" />
-      <div className="max-w-5xl w-full">
+    <div className="min-h-screen bg-gray-50">
+      <ToastContainer />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <BackButton />
-        <ProgressBar currentStep="checkout" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <CheckoutForm
-            paymentMethod={state.paymentMethod}
-            address={state.address}
-            payment={state.payment}
-            updateState={updateState}
-            updateAddress={updateAddress}
-            updatePayment={updatePayment}
-            placeOrder={placeOrder} // Pass the placeOrder function
-          />
-          <OrderSummary cartItems={state.cartItems} orderSummary={state.orderSummary} />
+        <ProgressBar currentStep={1} />
+        
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div>
+            <CheckoutForm
+              paymentMethod={state.paymentMethod}
+              address={state.address}
+              payment={state.payment}
+              updateState={updateState}
+              updateAddress={updateAddress}
+              updatePayment={updatePayment}
+              placeOrder={placeOrder}
+              cartItems={state.cartItems}
+              orderSummary={state.orderSummary}
+            />
+          </div>
+          
+          <div>
+            <OrderSummary
+              items={state.cartItems}
+              subtotal={state.orderSummary.subtotal}
+              shipping={state.orderSummary.shipping}
+              total={state.orderSummary.total}
+            />
+          </div>
         </div>
       </div>
     </div>

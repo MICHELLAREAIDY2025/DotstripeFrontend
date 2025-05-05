@@ -1,16 +1,19 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { FaArrowLeft } from "react-icons/fa"
+import { ArrowLeft } from "lucide-react"
 
 export default function BackButton() {
   const router = useRouter()
 
   return (
-    <div className="flex items-center gap-2 mb-4 cursor-pointer text-[#4A8C8C]" onClick={() => router.push("/cart")}>
-      <FaArrowLeft className="text-lg" />
-      <span className="text-sm font-medium">Back to Cart</span>
-    </div>
+    <button
+      onClick={() => router.back()}
+      className="flex items-center text-[#18608C] hover:text-[#17A0BF] transition-colors duration-300"
+    >
+      <ArrowLeft className="w-5 h-5 mr-2" />
+      Back to Cart
+    </button>
   )
 }
 

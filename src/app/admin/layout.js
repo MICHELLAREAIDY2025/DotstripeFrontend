@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import ProtectedAdminRoute from "@/app/Components/AdminProtectedRoute"
 import { useAuth } from "@/app/context/AuthContext"
 import Sidebar from "@/app/Components/sidebar"
@@ -10,57 +10,64 @@ import { ProductProvider } from "@/app/context/ProductContext"
 import { CategoryProvider } from "@/app/context/CategoryContext"
 import { OrderProvider } from "@/app/context/OrderContext"
 import { OrderItemProvider } from "@/app/context/OrderItemContext"
+import { toast } from "react-toastify"
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { user, isAuthenticated } = useAuth()
-
-  // Add a token check in the admin layout to ensure authentication
+  const { user, isAuthenticated, loading } = useAuth()
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    // Check if role exists in localStorage
-    const role = localStorage.getItem("role")
+    if (!loading) {
+      if (!isAuthenticated) {
+        toast.error("Please log in to access admin panel")
+        router.push("/login?redirect=/admin")
+        return
+      }
 
-    console.log("Admin Layout - Role check:", role)
-    console.log("Admin Layout - User from context:", user ? `ID: ${user.id}, Role: ${user.role}` : "Not set")
-    console.log("Admin Layout - Is authenticated:", isAuthenticated)
+      if (user && user.role !== "admin") {
+        toast.error("Access denied. Admin privileges required.")
+        router.push("/")
+        return
+      }
 
-    if (!isAuthenticated && !user) {
-      console.error("No authenticated user found in admin layout")
+      setAuthChecked(true)
     }
-
-    setAuthChecked(true)
-  }, [user, isAuthenticated])
-
-  // Add debugging to check token on layout mount
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    console.log("Admin Layout - Token check:", token ? "Present" : "Missing")
-    console.log("Admin Layout - Role check:", localStorage.getItem("role"))
-  }, [])
+  }, [user, isAuthenticated, loading, router])
 
   const isActive = (path) => {
     return pathname === path
   }
 
-  return (
-    <ProtectedAdminRoute>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1 min-h-screen ml-64 p-8">
-          <UsersProvider>
-            <ProductProvider>
-              <CategoryProvider>
-                <OrderProvider>
-                  <OrderItemProvider>{children}</OrderItemProvider>
-                </OrderProvider>
-              </CategoryProvider>
-            </ProductProvider>
-          </UsersProvider>
-        </main>
+  if (loading || !authChecked) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#18608C]"></div>
+        <p className="mt-4 text-gray-600">Verifying access...</p>
       </div>
-    </ProtectedAdminRoute>
+    )
+  }
+
+  if (!isAuthenticated || (user && user.role !== "admin")) {
+    return null
+  }
+
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <main className="flex-1 min-h-screen ml-64 p-8">
+        <UsersProvider>
+          <ProductProvider>
+            <CategoryProvider>
+              <OrderProvider>
+                <OrderItemProvider>{children}</OrderItemProvider>
+              </OrderProvider>
+            </CategoryProvider>
+          </ProductProvider>
+        </UsersProvider>
+      </main>
+    </div>
   )
 }

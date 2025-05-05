@@ -1,111 +1,241 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import axios from "axios"
 import { useAuth } from "@/app/context/AuthContext"
-import { ShoppingBag, Package, Users } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+import { FiUsers, FiShoppingBag, FiDollarSign } from "react-icons/fi"
+import { Bar } from "react-chartjs-2"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js"
 
-export default function DashboardPage() {
-  const { user } = useAuth()
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+)
+
+const DashboardPage = () => {
   const [stats, setStats] = useState({
-    orders: 0,
-    products: 0,
-    users: 0,
+    totalUsers: 0,
+    totalProducts: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    recentOrders: [],
+    monthlyRevenue: []
   })
   const [loading, setLoading] = useState(true)
+  const { user, isAuthenticated } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
-    // Simulate fetching dashboard data
-    const timer = setTimeout(() => {
-      setStats({
-        orders: 24,
-        products: 48,
-        users: 120,
-      })
-      setLoading(false)
-    }, 1000)
+    if (!isAuthenticated || user?.role !== "admin") {
+      toast.error("Access denied. Admin privileges required.")
+      router.push("/login?redirect=/admin/dashboard")
+      return
+    }
+    fetchStats()
+  }, [user, isAuthenticated, router])
 
-    return () => clearTimeout(timer)
-  }, [])
+  const fetchStats = async () => {
+    try {
+      const [usersRes, productsRes, ordersRes] = await Promise.all([
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
+          withCredentials: true
+        }),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
+          withCredentials: true
+        }),
+        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
+          withCredentials: true
+        })
+      ])
+
+      const orders = ordersRes.data
+      const totalRevenue = orders.reduce((sum, order) => 
+        sum + (parseFloat(order.total_amount) || 0), 0
+      )
+
+      // Calculate monthly revenue
+      const monthlyRevenue = orders.reduce((acc, order) => {
+        const date = new Date(order.created_at)
+        const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`
+        acc[monthYear] = (acc[monthYear] || 0) + (parseFloat(order.total_amount) || 0)
+        return acc
+      }, {})
+
+      setStats({
+        totalUsers: usersRes.data.length,
+        totalProducts: productsRes.data.length,
+        totalOrders: orders.length,
+        totalRevenue,
+        recentOrders: orders.slice(0, 5),
+        monthlyRevenue: Object.entries(monthlyRevenue).map(([month, amount]) => ({
+          month,
+          amount
+        }))
+      })
+    } catch (error) {
+      console.error("Error fetching stats:", error)
+      toast.error("Failed to fetch dashboard statistics")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const chartData = {
+    labels: stats.monthlyRevenue.map(item => item.month),
+    datasets: [
+      {
+        label: "Monthly Revenue",
+        data: stats.monthlyRevenue.map(item => item.amount),
+        backgroundColor: "#18608C",
+        borderRadius: 8,
+      },
+    ],
+  }
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: "Monthly Revenue",
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => `$${value.toFixed(2)}`,
+        },
+      },
+    },
+  }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#18608C]"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading dashboard...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
 
-      {/* Statistics Cards - Vertical Layout */}
-      <div className="space-y-6 mb-8">
-        {/* Orders Card */}
-        <Link href="/admin/orders" className="block bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <div className="flex items-center">
-            <div className="p-4 rounded-full bg-blue-100 mr-6">
-              <ShoppingBag className="h-8 w-8 text-blue-600" />
-            </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg text-gray-500">Total Orders</p>
-              <p className="text-3xl font-semibold">{stats.orders}</p>
+              <p className="text-gray-500 text-sm">Total Users</p>
+              <h2 className="text-3xl font-bold text-[#18608C]">{stats.totalUsers}</h2>
             </div>
+            <FiUsers className="text-4xl text-[#18608C] opacity-50" />
           </div>
-        </Link>
+        </div>
 
-        {/* Products Card */}
-        <Link href="/admin/products" className="block bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <div className="flex items-center">
-            <div className="p-4 rounded-full bg-green-100 mr-6">
-              <Package className="h-8 w-8 text-green-600" />
-            </div>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg text-gray-500">Total Products</p>
-              <p className="text-3xl font-semibold">{stats.products}</p>
+              <p className="text-gray-500 text-sm">Total Products</p>
+              <h2 className="text-3xl font-bold text-[#18608C]">{stats.totalProducts}</h2>
             </div>
+            <FiShoppingBag className="text-4xl text-[#18608C] opacity-50" />
           </div>
-        </Link>
+        </div>
 
-        {/* Users Card */}
-        <Link href="/admin/users" className="block bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-          <div className="flex items-center">
-            <div className="p-4 rounded-full bg-purple-100 mr-6">
-              <Users className="h-8 w-8 text-purple-600" />
-            </div>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg text-gray-500">Total Users</p>
-              <p className="text-3xl font-semibold">{stats.users}</p>
+              <p className="text-gray-500 text-sm">Total Revenue</p>
+              <h2 className="text-3xl font-bold text-[#18608C]">
+                ${stats.totalRevenue.toFixed(2)}
+              </h2>
             </div>
+            <FiDollarSign className="text-4xl text-[#18608C] opacity-50" />
           </div>
-        </Link>
+        </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            href="/admin/products"
-            className="px-6 py-3 bg-[#18608C] text-white rounded-md text-center hover:bg-[#18608C]/90 transition-colors"
-          >
-            Manage Products
-          </Link>
-          <Link
-            href="/admin/orders"
-            className="px-6 py-3 bg-[#18608C] text-white rounded-md text-center hover:bg-[#18608C]/90 transition-colors"
-          >
-            View Orders
-          </Link>
-          <Link
-            href="/admin/users"
-            className="px-6 py-3 bg-[#18608C] text-white rounded-md text-center hover:bg-[#18608C]/90 transition-colors"
-          >
-            Manage Users
-          </Link>
+      {/* Revenue Chart */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <Bar data={chartData} options={chartOptions} />
+      </div>
+
+      {/* Recent Orders Table */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-bold mb-4">Recent Orders</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {stats.recentOrders.map((order) => (
+                <tr key={order.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    #{order.id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(order.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                      order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                      order.status === 'shipped' ? 'bg-purple-100 text-purple-800' :
+                      order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${parseFloat(order.total_amount).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   )
 }
+
+export default DashboardPage

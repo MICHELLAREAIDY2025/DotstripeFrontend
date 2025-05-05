@@ -1,22 +1,26 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { ToastContainer } from "react-toastify"
+import { ShoppingBag } from "lucide-react"
 
 export default function EmptyCartState() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-[#f9f6f2] flex justify-center items-center p-6">
-      <ToastContainer position="top-center" autoClose={5000} theme="colored" />
-      <div className="max-w-md w-full p-8 rounded-lg shadow-lg text-center">
-        <h2 className="text-2xl font-bold mb-4 text-[#4A8C8C]">Your cart is empty</h2>
-        <p className="text-gray-600 mb-6">Add some products to your cart and come back to checkout.</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+        <div className="flex justify-center mb-6">
+          <ShoppingBag className="w-16 h-16 text-[#18608C]" />
+        </div>
+        
+        <h2 className="text-2xl font-bold text-[#18608C] mb-4">Your cart is empty</h2>
+        <p className="text-gray-600 mb-8">Add some products to your cart and come back to checkout.</p>
+        
         <button
-          onClick={() => router.push("/")}
-          className="w-full bg-[#4A8C8C] text-white py-3 rounded-lg text-lg hover:bg-[#3a6f6f]"
+          onClick={() => router.push("/products")}
+          className="w-full bg-[#18608C] text-white py-3 px-4 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
         >
-          Go and Shop
+          Continue Shopping
         </button>
       </div>
     </div>

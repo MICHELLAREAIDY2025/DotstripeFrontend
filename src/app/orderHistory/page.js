@@ -1,34 +1,51 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getUserOrders } from "../../lib/api";
+import axios from "axios";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 import Header from "../Components/navbar";
 import Footer from "../Components/footer";
+import { notify } from "@/app/Components/checkout/utils/toast";
 
 const OrdersHistory = () => {
   const [orders, setOrders] = useState([]);
-  const [orderItems, setOrderItems] = useState([]);
-  const [products, setProducts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [startDate, setStartDate] = useState(""); // Start Date filter
   const [endDate, setEndDate] = useState(""); // End Date filter
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const { user } = useAuth();
+  const router = useRouter();
 
-  // Fetch Orders for Logged-in User
+  useEffect(() => {
+    if (!user) {
+      notify("error", "Please log in to view your orders");
+      router.push("/login?redirect=/orderHistory");
+      return;
+    }
+
+    fetchOrders();
+  }, [user, router]);
+
   const fetchOrders = async () => {
     try {
-      const orders = await getUserOrders();
-      console.log("Orders Fetched:", orders);
-      // Normalize id field for frontend rendering
-      const normalizedOrders = Array.isArray(orders)
-        ? orders.map(order => ({ ...order, id: order.id || order._id }))
-        : [];
-      setOrders(normalizedOrders);
-      setFilteredOrders(normalizedOrders); // Show all orders
-    } catch (err) {
-      console.error("Error fetching orders:", err);
-      setError("Unable to fetch orders.");
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/user`, {
+        withCredentials: true,
+      });
+      
+      // Ensure total_amount is a number
+      const formattedOrders = response.data.map(order => ({
+        ...order,
+        total_amount: parseFloat(order.total_amount) || 0,
+        created_at: order.created_at || order.createdAt,
+        status: order.status || 'pending'
+      }));
+      
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      notify("error", "Failed to fetch orders. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -42,9 +59,9 @@ const OrdersHistory = () => {
     }
 
     const filtered = orders.filter(order => {
-      if (!order.createdAt) return false; // Handle missing `createdAt`
+      if (!order.created_at) return false; // Handle missing created_at
       
-      const orderDate = new Date(order.createdAt).toISOString().split("T")[0]; // Convert to YYYY-MM-DD
+      const orderDate = new Date(order.created_at).toISOString().split("T")[0]; // Convert to YYYY-MM-DD
       console.log(`Order Date: ${orderDate}, Start Date: ${startDate}, End Date: ${endDate}`);
 
       if (startDate && endDate) {
@@ -60,176 +77,120 @@ const OrdersHistory = () => {
     setFilteredOrders(filtered);
   };
 
-  // Fetch Order Items for Each Order
-  const fetchOrderItems = async () => {
-    try {
-      const itemPromises = orders.map((order) =>
-        axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/${order.id}/items`, { withCredentials: true })
-      );
-      const itemResponses = await Promise.all(itemPromises);
-      const allItems = itemResponses.flatMap((res) => res.data);
-      console.log("Order Items Fetched:", allItems);
+  const formatDate = (dateString) => {
+    if (!dateString) return "Date not available";
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
-      const processedItems = allItems.map(item => {
-        if (item.Product) {
-          return {
-            ...item,
-            productName: item.Product.name,
-            productPrice: item.Product.price,
-            productImage: item.Product.image 
-          };
-        }
-        return {
-          ...item,
-          productName: "Unknown Product",
-          productPrice: 0,
-          productImage: null
-        };
-      });
-  
-      setOrderItems(processedItems);
-    } catch (err) {
-      console.error("Error fetching order items:", err);
-      setError("Unable to fetch order items.");
-      setLoading(false);
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "processing":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  // Fetch Product Data
-  const fetchProducts = async () => {
-    if (orderItems.length === 0) return; 
-  
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products/`);
-      console.log("Products Fetched:", response.data); //  Debugging Log
-      const productMap = response.data.reduce((acc, product) => {
-        acc[product.id] = product;
-        return acc;
-      }, {});
-      setProducts(productMap);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      setError("Unable to fetch products.");
-    } finally {
-      setLoading(false); // Ensure loading stops
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center pt-24">
+          <div className="text-xl">Loading your orders...</div>
+        </div>
+      </div>
+    );
+  }
 
-  // Fetch data when component mounts
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  useEffect(() => {
-    if (orders.length > 0) {
-      fetchOrderItems();
-      setFilteredOrders(orders); //  Update filtered list when orders change
-    }
-  }, [orders]);
-
-  useEffect(() => {
-    if (orderItems.length > 0) {
-      fetchProducts();
-    }
-  }, [orderItems]);
-
-  if (loading) return <div className="text-center text-xl text-white">Loading...</div>;
+  if (!orders.length) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 container mx-auto px-4 pt-24 pb-12">
+          <h1 className="text-3xl font-bold mb-6">Order History</h1>
+          <div className="bg-white bg-opacity-10 rounded-lg p-8 text-center">
+            <p className="text-xl mb-4">You haven't placed any orders yet</p>
+            <button
+              onClick={() => router.push("/products")}
+              className="bg-[#18608C] text-white px-6 py-3 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
+            >
+              Start Shopping
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="px-6 py-12 bg-[#031626]">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="bg-[#18608C] h-[20vh] flex items-center justify-center mt-20">
-        <h1 className="text-white text-5xl sm:text-6xl font-bold text-center">Orders History</h1>
-      </div>
-      {error && <div className="text-red-500 text-center">{error}</div>}
-
-      {/* Date Range Filter */}
-      <div className="flex justify-center items-center flex-wrap gap-4 mb-6 mt-6">
-        <label className="flex flex-col text-sm text-white">
-          Start Date
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md mt-1 bg-[#18608C] text-white"
-          />
-        </label>
-
-        <label className="flex flex-col text-sm text-white">
-          End Date
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md mt-1 bg-[#18608C] text-white"
-          />
-        </label>
-
-        {/* Search Button */}
-        <button
-          onClick={handleSearch}
-          disabled={!startDate && !endDate}
-          className={`px-4 py-2 rounded-md text-white mt-6 ${startDate || endDate ? "bg-[#18608C] hover:bg-[#17A0BF]" : "bg-gray-400 cursor-not-allowed"}`}
-        >
-          Search
-        </button>
-
-        {/* Clear Filter Button */}
-        {(startDate || endDate) && (
-          <button
-            onClick={() => {
-              setStartDate("");
-              setEndDate("");
-              setFilteredOrders(orders);
-            }}
-            className="px-4 py-2 bg-red-500 text-white rounded-md mt-6"
-          >
-            Clear
-          </button>
-        )}
-      </div>
-
-      {/* Orders List (Now Uses `filteredOrders`) */}
-      <div className="max-w-4xl mx-auto space-y-6">
-        {filteredOrders.length === 0 ? (
-          <p className="text-center text-white">No orders found</p>
-        ) : (
-          filteredOrders.map((order) => (
-            <div key={order.id} className="bg-[#18608C] p-4 rounded-lg shadow-md mb-4">
-              <h2 className="text-xl font-semibold text-white mb-2">
-                Order ID: {order.id} - {order.status}
-              </h2>
-
-              <div className="space-y-4">
-                {orderItems.filter(item => item.order_id === order.id).map((item) => {
-                  const product = products[item.product_id] || {};
-
-                  return (
-                    <div key={item.id} className="flex items-center bg-gray-50 p-4 rounded-lg shadow-sm">
-                      <img
-                        src={product.image ? product.image[0] : "https://via.placeholder.com/100"}
-                        alt={product.name}
-                        className="w-24 h-24 object-cover rounded-lg"
-                      />
-                      <div className="flex-1 ml-4">
-                        <div className="text-lg font-medium text-gray-900">{product.name}</div>
-                        <div className="text-sm text-gray-500">Price: ${product.price}</div>
-                        <div className="text-sm text-gray-500">Quantity: {item.quantity}</div>
+      <div className="flex-1 container mx-auto px-4 pt-24 pb-12">
+        <h1 className="text-3xl font-bold mb-6">Order History</h1>
+        <div className="space-y-6">
+          {orders.map((order) => (
+            <div key={order.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h2 className="text-xl font-semibold">Order #{order.id}</h2>
+                    <p className="text-gray-600">Placed on {formatDate(order.created_at)}</p>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                    {order.status || 'pending'}
+                  </span>
+                </div>
+                
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="font-medium mb-2">Order Items</h3>
+                  <div className="space-y-4">
+                    {order.OrderItems?.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden">
+                            {item.Product?.image_url && (
+                              <img
+                                src={item.Product.image_url}
+                                alt={item.Product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-medium">{item.Product?.name || "Product unavailable"}</h4>
+                            <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                          </div>
+                        </div>
+                        <p className="font-medium">${(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
                       </div>
-                      <div className="text-lg font-semibold text-gray-800">
-                        Total: ${(product.price * item.quantity).toFixed(2)}
-                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-gray-600">Total Amount</p>
+                      <p className="text-lg font-semibold">${order.total_amount.toFixed(2)}</p>
                     </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-4 text-gray-500">
-                Ordered On: {new Date(order.createdAt).toLocaleDateString()}
+                    <div>
+                      <p className="text-gray-600">Payment Method</p>
+                      <p className="font-medium capitalize">{order.payment_method?.replace(/_/g, " ") || "Not specified"}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          ))
-        )}
+          ))}
+        </div>
       </div>
       <Footer />
     </div>

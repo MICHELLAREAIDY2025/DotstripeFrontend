@@ -232,12 +232,23 @@ const UsersPage = () => {
   }
 
   const handleEditUser = (user) => {
-    const address = {
-      region: user.address?.region || "",
-      "address-direction": user.address?.["address-direction"] || "",
-      phone: user.address?.phone || "",
-      building: user.address?.building || "",
-      floor: user.address?.floor || "",
+    // Parse the address if it's a string
+    let address = {
+      region: "",
+      "address-direction": "",
+      phone: "",
+      building: "",
+      floor: "",
+    }
+
+    try {
+      if (typeof user.address === 'string') {
+        address = JSON.parse(user.address)
+      } else if (user.address) {
+        address = user.address
+      }
+    } catch (error) {
+      console.error("Error parsing address:", error)
     }
 
     setEditUserId(user.id)
@@ -245,7 +256,7 @@ const UsersPage = () => {
       id: user.id,
       name: user.name || "",
       email: user.email || "",
-      password: "",
+      password: "", // Keep password empty for security
       address,
       role: user.role || "customer",
     })
@@ -268,7 +279,7 @@ const UsersPage = () => {
       return
     }
 
-    // Validate password if it's being changed
+    // Validate password only if it's being changed
     if (newUser.password) {
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/
       if (!passwordRegex.test(newUser.password)) {
@@ -303,7 +314,7 @@ const UsersPage = () => {
 
       // Only include password if it's being changed
       if (newUser.password) {
-        userData.password = newUser.password
+        userData.newPassword = newUser.password
       }
 
       // Log the formatted data being sent

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
+import { toast } from "react-toastify"
 
 const ProtectedAdminRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth()
@@ -10,19 +11,25 @@ const ProtectedAdminRoute = ({ children }) => {
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
-    // Only check when auth loading is complete
-    if (!loading) {
-      if (!isAuthenticated) {
-        console.log("Not authenticated, redirecting to login")
-        router.push("/login")
-      } else if (user && user.role !== "admin") {
-        console.log("Not an admin, redirecting to home")
-        router.push("/")
-      } else {
-        console.log("Admin access granted")
+    const checkAuth = async () => {
+      if (!loading) {
+        if (!isAuthenticated) {
+          toast.error("Please log in to access admin panel")
+          router.push("/login?redirect=/admin")
+          return
+        }
+
+        if (user && user.role !== "admin") {
+          toast.error("Access denied. Admin privileges required.")
+          router.push("/")
+          return
+        }
+
+        setIsChecking(false)
       }
-      setIsChecking(false)
     }
+
+    checkAuth()
   }, [user, loading, isAuthenticated, router])
 
   // Show loading state while checking authentication

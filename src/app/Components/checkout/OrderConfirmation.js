@@ -1,26 +1,44 @@
 "use client"
 
+import { CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { FaHome } from "react-icons/fa"
-import { ToastContainer } from "react-toastify"
-import ProgressBar from "../ProgressBar"
 
 export default function OrderConfirmation({ orderId }) {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-[#f9f6f2] flex justify-center p-6">
-      <ToastContainer position="top-center" autoClose={5000} theme="colored" />
-      <div className="max-w-5xl w-full">
-        <ProgressBar currentStep="confirmation" />
-        <div className="p-8 rounded-lg shadow-lg text-center mt-6">
-          <h2 className="text-5xl font-bold mb-6 text-[#4A8C8C]">Your order is currently being prepared with care!</h2>
-           <p className="text-3xl text-gray-600 mb-6">Thank you for your purchase!</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+        <div className="flex justify-center mb-6">
+          <CheckCircle className="w-16 h-16 text-[#18608C]" />
+        </div>
+        
+        <h1 className="text-2xl font-bold text-[#18608C] mb-4">Order Confirmed!</h1>
+        
+        <div className="space-y-4 mb-8">
+          <p className="text-gray-600">
+            Your order #{orderId} has been successfully placed.
+          </p>
+          <p className="text-[#18608C] font-medium">
+            Your order is currently being prepared with care!
+          </p>
+          <p className="text-[#18608C] font-medium">
+            Thank you for your purchase!
+          </p>
+        </div>
+
+        <div className="space-y-4">
           <button
-            onClick={() => router.push("/")}
-            className="flex items-center justify-center gap-2 mx-auto bg-[#4A8C8C] text-white py-3 px-6 rounded-lg text-lg hover:bg-[#3a6f6f]"
+            onClick={() => router.push("/orderHistory")}
+            className="w-full bg-[#18608C] text-white py-3 px-4 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
           >
-            <FaHome /> Go and see what we have more
+            View Order History
+          </button>
+          <button
+            onClick={() => router.push("/products")}
+            className="w-full bg-white text-[#18608C] border border-[#18608C] py-3 px-4 rounded-md hover:bg-[#18608C] hover:text-white transition-colors duration-300"
+          >
+            Continue Shopping
           </button>
         </div>
       </div>

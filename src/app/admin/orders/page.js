@@ -11,6 +11,9 @@ import "react-confirm-alert/src/react-confirm-alert.css"
 import Link from "next/link"
 import emailjs from '@emailjs/browser'
 
+// Initialize EmailJS
+emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+
 const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -60,21 +63,20 @@ const AdminOrdersPage = () => {
   const sendOrderStatusEmail = async (order, newStatus) => {
     try {
       const templateParams = {
-        to_name: order.User?.name || 'Valued Customer',
+        to_name: order.user?.name || 'Customer',
+        to_email: order.user?.email,
         order_id: order.id,
-        status: newStatus.charAt(0).toUpperCase() + newStatus.slice(1),
+        status: newStatus,
         message: getStatusMessage(newStatus),
         company_name: 'Dotstripe',
-        to_email: order.User?.email,
-        from_name: 'Dotstripe',
-        reply_to: process.env.NEXT_PUBLIC_EMAILJS_REPLY_TO
+        from_name: 'Dotstripe Support',
+        reply_to: process.env.NEXT_PUBLIC_EMAILJS_REPLY_TO || 'support@dotstripe.com'
       }
 
       await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
         process.env.NEXT_PUBLIC_EMAILJS_ORDER_TEMPLATE,
-        templateParams,
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+        templateParams
       )
 
       return true

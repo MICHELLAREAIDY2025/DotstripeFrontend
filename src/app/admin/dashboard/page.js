@@ -154,7 +154,7 @@ const DashboardPage = () => {
             </div>
             <FiUsers className="text-4xl text-[#18608C] opacity-50" />
           </div>
-        </div>
+            </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between">
@@ -164,7 +164,7 @@ const DashboardPage = () => {
             </div>
             <FiShoppingBag className="text-4xl text-[#18608C] opacity-50" />
           </div>
-        </div>
+            </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between">

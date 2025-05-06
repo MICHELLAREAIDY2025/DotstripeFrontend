@@ -34,17 +34,15 @@ API.interceptors.response.use(
     // Check if the response includes a token and save it
     if (response.data && response.data.token) {
       localStorage.setItem("token", response.data.token)
-      console.log("Token saved from response")
     }
     return response
   },
   (error) => {
     // Handle 401 errors globally
     if (error.response && error.response.status === 401) {
-      console.error("Unauthorized access (401):", error.response.data)
+      // Clear auth data
       localStorage.removeItem("token")
       localStorage.removeItem("role")
-      // We don't redirect here to avoid circular dependencies with AuthContext
     }
     return Promise.reject(error)
   },

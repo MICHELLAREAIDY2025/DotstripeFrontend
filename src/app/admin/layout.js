@@ -31,9 +31,9 @@ export default function AdminLayout({ children }) {
         toast.error("Access denied. Admin privileges required.")
         router.push("/")
         return
-      }
+    }
 
-      setAuthChecked(true)
+    setAuthChecked(true)
     }
   }, [user, isAuthenticated, loading, router])
 
@@ -55,19 +55,19 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 min-h-screen ml-64 p-8">
-        <UsersProvider>
-          <ProductProvider>
-            <CategoryProvider>
-              <OrderProvider>
-                <OrderItemProvider>{children}</OrderItemProvider>
-              </OrderProvider>
-            </CategoryProvider>
-          </ProductProvider>
-        </UsersProvider>
-      </main>
-    </div>
+      <div className="flex min-h-screen">
+        <Sidebar />
+        <main className="flex-1 min-h-screen ml-64 p-8">
+          <UsersProvider>
+            <ProductProvider>
+              <CategoryProvider>
+                <OrderProvider>
+                  <OrderItemProvider>{children}</OrderItemProvider>
+                </OrderProvider>
+              </CategoryProvider>
+            </ProductProvider>
+          </UsersProvider>
+        </main>
+      </div>
   )
 }

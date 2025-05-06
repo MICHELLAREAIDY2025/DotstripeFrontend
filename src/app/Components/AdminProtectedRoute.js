@@ -12,8 +12,8 @@ const ProtectedAdminRoute = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (!loading) {
-        if (!isAuthenticated) {
+    if (!loading) {
+      if (!isAuthenticated) {
           toast.error("Please log in to access admin panel")
           router.push("/login?redirect=/admin")
           return
@@ -21,12 +21,12 @@ const ProtectedAdminRoute = ({ children }) => {
 
         if (user && user.role !== "admin") {
           toast.error("Access denied. Admin privileges required.")
-          router.push("/")
+        router.push("/")
           return
-        }
-
-        setIsChecking(false)
       }
+
+      setIsChecking(false)
+    }
     }
 
     checkAuth()

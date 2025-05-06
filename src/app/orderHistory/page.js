@@ -143,15 +143,15 @@ const OrdersHistory = () => {
                   <div>
                     <h2 className="text-xl font-semibold">Order #{order.id}</h2>
                     <p className="text-gray-600">Placed on {formatDate(order.created_at)}</p>
-                  </div>
+      </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                     {order.status || 'pending'}
                   </span>
-                </div>
-                
+      </div>
+
                 <div className="border-t border-gray-200 pt-4">
                   <h3 className="font-medium mb-2">Order Items</h3>
-                  <div className="space-y-4">
+              <div className="space-y-4">
                     {order.OrderItems?.map((item) => (
                       <div key={item.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
@@ -161,7 +161,7 @@ const OrdersHistory = () => {
                                 src={item.Product.image_url}
                                 alt={item.Product.name}
                                 className="w-full h-full object-cover"
-                              />
+                      />
                             )}
                           </div>
                           <div>
@@ -180,13 +180,13 @@ const OrdersHistory = () => {
                     <div>
                       <p className="text-gray-600">Total Amount</p>
                       <p className="text-lg font-semibold">${order.total_amount.toFixed(2)}</p>
-                    </div>
+                      </div>
                     <div>
                       <p className="text-gray-600">Payment Method</p>
                       <p className="font-medium capitalize">{order.payment_method?.replace(/_/g, " ") || "Not specified"}</p>
                     </div>
                   </div>
-                </div>
+              </div>
               </div>
             </div>
           ))}

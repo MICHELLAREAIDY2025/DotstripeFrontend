@@ -71,21 +71,21 @@ export default function Checkout() {
       })
   }, [user, router])
 
-  const placeOrder = async () => {
-    try {
+     const placeOrder = async () => {
+        try {
       if (!user) {
         notify("error", "Please log in to complete your checkout")
         router.push("/login?redirect=/checkout")
         return false
       }
-      await checkout()
-      return true
-    } catch (error) {
-      console.error("Error clearing cart:", error)
+        await checkout()
+        return true
+        } catch (error) {
+    console.error("Error clearing cart:", error)
       notify("error", "Failed to complete checkout. Please try again.")
-      return false
-    }
+        return false
   }
+}
 
   // Conditional rendering based on state
   if (state.isLoading) return <LoadingState />
@@ -101,13 +101,13 @@ export default function Checkout() {
         
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
           <div>
-            <CheckoutForm
-              paymentMethod={state.paymentMethod}
-              address={state.address}
-              payment={state.payment}
-              updateState={updateState}
-              updateAddress={updateAddress}
-              updatePayment={updatePayment}
+          <CheckoutForm
+            paymentMethod={state.paymentMethod}
+            address={state.address}
+            payment={state.payment}
+            updateState={updateState}
+            updateAddress={updateAddress}
+            updatePayment={updatePayment}
               placeOrder={placeOrder}
               cartItems={state.cartItems}
               orderSummary={state.orderSummary}

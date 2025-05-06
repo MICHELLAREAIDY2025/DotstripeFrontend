@@ -56,8 +56,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true)
     try {
-      console.log("Attempting login with:", credentials.email)
-
       const res = await loginUser(credentials)
 
       // Handle different response formats
@@ -66,12 +64,8 @@ export const AuthProvider = ({ children }) => {
 
       if (token) {
         localStorage.setItem("token", token)
-        console.log("Token saved to localStorage")
-      } else {
-        console.warn("No token received in login response")
       }
 
-      console.log("Login successful:", userData)
       setUser(userData)
       setIsAuthenticated(true)
 
@@ -88,10 +82,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       return userData
-    } catch (error) {
-      console.error("Login error:", error)
-      toast.error(error.response?.data?.message || "Invalid email or password")
-      throw error
+    } catch {
+      // Simple error message for invalid credentials
+      toast.error("Invalid email or password")
+      return null
     } finally {
       setLoading(false)
     }

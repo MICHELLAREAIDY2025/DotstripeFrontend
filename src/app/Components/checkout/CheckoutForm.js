@@ -49,7 +49,7 @@ export default function CheckoutForm({ paymentMethod, address, payment, updateSt
         const success = await placeOrder()
         
         if (success) {
-          updateState({ orderPlaced: true, orderId: order._id || order.id })
+        updateState({ orderPlaced: true, orderId: order._id || order.id })
           notify("success", "Your order has been placed successfully!")
         } else {
           notify("error", "Failed to place order. Please try again.")
@@ -107,7 +107,7 @@ export default function CheckoutForm({ paymentMethod, address, payment, updateSt
       {paymentMethod === "paytab" && (
         <PaymentForm payment={payment} updatePayment={updatePayment} />
       )}
-
+ 
       <button
         onClick={handleCheckout}
         disabled={isSubmitting}

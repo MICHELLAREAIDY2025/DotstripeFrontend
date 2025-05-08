@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { useOrders } from "@/app/context/OrderContext"
 import { useOrderItems } from "@/app/context/OrderItemContext"
-import OrderList from "../../components/orders/OrderList"
-import OrderForm from "../../components/orders/OrderForm"
-import OrderItemList from "../../components/orders/OrderItemList"
-import OrderItemForm from "../../components/orders/OrderItemForm"
+import OrderList from "@/app/Components/orders/OrderList"
+import OrderForm from "@/app/Components/orders/OrderForm"
+import OrderItemList from "@/app/Components/orders/OrderItemList"
+import OrderItemForm from "@/app/Components/orders/OrderItemForm"
 import ProtectAdminRoute from "@/app/Components/AdminProtectedRoute"
 
 const AdminOrdersPage = () => {

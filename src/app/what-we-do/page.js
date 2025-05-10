@@ -148,40 +148,40 @@ export default function WhatWeDo() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {/* Partner logos */}
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/aruba.png" alt="Aruba" fill className="object-contain" />
+                  <Image src="/images/partners/Aruba.png" alt="Aruba" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/3m.png" alt="3M" fill className="object-contain" />
+                  <Image src="/images/partners/3M.png" alt="3M" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/axis.png" alt="Axis" fill className="object-contain" />
+                  <Image src="/images/partners/Axis.png" alt="Axis" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/canon.png" alt="Canon" fill className="object-contain" />
+                  <Image src="/images/partners/Canon.png" alt="Canon" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/dahua.png" alt="Dahua" fill className="object-contain" />
+                  <Image src="/images/partners/Dahua.png" alt="Dahua" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/epson.png" alt="Epson" fill className="object-contain" />
+                  <Image src="/images/partners/Epson.png" alt="Epson" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/hikvision.png" alt="Hikvision" fill className="object-contain" />
+                  <Image src="/images/partners/Hikvision.png" alt="Hikvision" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/hp.png" alt="HP" fill className="object-contain" />
+                  <Image src="/images/partners/HP.png" alt="HP" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/lg.png" alt="LG" fill className="object-contain" />
+                  <Image src="/images/partners/LG.png" alt="LG" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/ibm.png" alt="IBM" fill className="object-contain" />
+                  <Image src="/images/partners/IBM.png" alt="IBM" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/intel.png" alt="Intel" fill className="object-contain" />
+                  <Image src="/images/partners/Intel.png" alt="Intel" fill className="object-contain" />
                 </div>
                 <div className="relative aspect-square w-full max-w-[120px] mx-auto">
-                  <Image src="/images/partners/kaspersky.png" alt="Kaspersky" fill className="object-contain" />
+                  <Image src="/images/partners/Kaspersky.png" alt="Kaspersky" fill className="object-contain" />
                 </div>
               </div>
             </div>

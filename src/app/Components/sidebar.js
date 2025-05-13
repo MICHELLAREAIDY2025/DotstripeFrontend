@@ -46,7 +46,10 @@ const Sidebar = () => {
   ]
 
   const isActive = (path) => {
-    return pathname === path || pathname.startsWith(`${path}/`)
+    if (path === "/admin") {
+      return pathname === "/admin" || pathname === "/admin/dashboard"
+    }
+    return pathname === path || (pathname.startsWith(`${path}/`) && path !== "/admin")
   }
 
   return (

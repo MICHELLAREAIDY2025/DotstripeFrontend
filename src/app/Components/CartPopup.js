@@ -103,8 +103,11 @@ export default function CartPopup({ isOpen, onClose }) {
                   </div>
                   <div className="flow-root">
                     <ul className="-my-6 divide-y divide-gray-200">
-                      {cartItems.map((item) => (
-                        <li key={`${item.product_id}-${item.id || item.quantity}`} className="py-6 flex">
+                      {cartItems.map((item, index) => (
+                        <li 
+                          key={`${item.product_id}-${item.id || item.quantity}-${index}-${Date.now()}`} 
+                          className="py-6 flex"
+                        >
                           {/* Product Image */}
                           {item.Product?.image_url && (
                             <div className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden">

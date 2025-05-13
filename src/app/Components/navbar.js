@@ -5,25 +5,33 @@ import { useAuth } from "../context/AuthContext"
 import { useCart } from "../context/Cartcontext"
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { ShoppingCart, UserCircle, LogIn, Menu, X, LogOut, Settings, ShoppingBag } from "lucide-react"
+import { useRouter, usePathname } from "next/navigation"
+import { ShoppingCart, UserCircle, LogIn, Menu, X, LogOut, Settings, ShoppingBag, ChevronDown } from "lucide-react"
 import CartPopup from "./CartPopup"
 
 const Navbar = () => {
   const { user, logout } = useAuth()
   const { cartCount, loading, isCartOpen, toggleCart } = useCart()
   const router = useRouter()
+  const pathname = usePathname()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isWhatWeDoOpen, setIsWhatWeDoOpen] = useState(false)
+  const [isMobileWhatWeDoOpen, setIsMobileWhatWeDoOpen] = useState(false)
+
   const dropdownRef = useRef(null)
   const userIconRef = useRef(null)
+  const whatWeDoRef = useRef(null)
+  const whatWeDoButtonRef = useRef(null)
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen)
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const toggleWhatWeDo = () => setIsWhatWeDoOpen(!isWhatWeDoOpen)
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Handle user dropdown
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target) &&
@@ -31,6 +39,16 @@ const Navbar = () => {
         !userIconRef.current.contains(event.target)
       ) {
         setIsDropdownOpen(false)
+      }
+
+      // Handle What We Do dropdown
+      if (
+        whatWeDoRef.current &&
+        !whatWeDoRef.current.contains(event.target) &&
+        whatWeDoButtonRef.current &&
+        !whatWeDoButtonRef.current.contains(event.target)
+      ) {
+        setIsWhatWeDoOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -40,7 +58,11 @@ const Navbar = () => {
   const handleNavigation = (path) => {
     router.push(path)
     setIsMenuOpen(false)
+    setIsMobileWhatWeDoOpen(false)
   }
+
+  // Check if current path is in What We Do section
+  const isInWhatWeDo = pathname?.startsWith("/what-we-do")
 
   if (loading)
     return (
@@ -80,11 +102,33 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex text-base lg:text-lg font-medium text-white">
           <ul className="flex items-center h-full space-x-8 lg:space-x-12">
-            <li className="flex items-center">
-              <Link href="/what-we-do" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
+            {/* What We Do with dropdown */}
+            <li className="relative" ref={whatWeDoRef}>
+              <button
+                ref={whatWeDoButtonRef}
+                className={`flex items-center hover:text-[#17A0BF] transition-colors py-2 px-1 ${isInWhatWeDo ? "text-[#17A0BF]" : ""}`}
+                onClick={toggleWhatWeDo}
+                onMouseEnter={() => setIsWhatWeDoOpen(true)}
+              >
                 What we do
-              </Link>
+                <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isWhatWeDoOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isWhatWeDoOpen && (
+                <div
+                  className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                  onMouseLeave={() => setIsWhatWeDoOpen(false)}
+                >
+                  <Link href="/what-we-do/services" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Services
+                  </Link>
+                  <Link href="/what-we-do/products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Products
+                  </Link>
+                </div>
+              )}
             </li>
+
             <li className="flex items-center">
               <Link href="/what-we-think" className="hover:text-[#17A0BF] transition-colors py-2 px-1">
                 What we think
@@ -187,9 +231,34 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-[#031626] border-t border-gray-700 px-4 py-3">
           <nav className="flex flex-col space-y-3 text-white">
-            <button onClick={() => handleNavigation("/what-we-do")} className="text-left py-2 hover:text-[#17A0BF]">
-              What we do
-            </button>
+            {/* Mobile What We Do with dropdown */}
+            <div>
+              <button
+                onClick={() => setIsMobileWhatWeDoOpen(!isMobileWhatWeDoOpen)}
+                className={`flex items-center justify-between w-full text-left py-2 hover:text-[#17A0BF] ${isInWhatWeDo ? "text-[#17A0BF]" : ""}`}
+              >
+                <span>What we do</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${isMobileWhatWeDoOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isMobileWhatWeDoOpen && (
+                <div className="pl-4 border-l border-gray-700 ml-2 mt-1 space-y-2">
+                  <button
+                    onClick={() => handleNavigation("/what-we-do/services")}
+                    className="block py-2 text-left w-full hover:text-[#17A0BF]"
+                  >
+                    Services
+                  </button>
+                  <button
+                    onClick={() => handleNavigation("/what-we-do/products")}
+                    className="block py-2 text-left w-full hover:text-[#17A0BF]"
+                  >
+                    Products
+                  </button>
+                </div>
+              )}
+            </div>
+
             <button onClick={() => handleNavigation("/what-we-think")} className="text-left py-2 hover:text-[#17A0BF]">
               What we think
             </button>

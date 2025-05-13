@@ -22,6 +22,7 @@ const UsersPage = () => {
   const [filteredUsers, setFilteredUsers] = useState([])
   const [roleFilter, setRoleFilter] = useState("all")
   const [editUserId, setEditUserId] = useState(null)
+  const [isFormExpanded, setIsFormExpanded] = useState(true)
   const [newUser, setNewUser] = useState({
     id: null,
     name: "",
@@ -396,82 +397,93 @@ const UsersPage = () => {
 
       {/* User Form */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-bold mb-4">{editUserId ? "Edit User" : "Add New User"}</h2>
-        <form ref={formRef} onSubmit={editUserId ? handleUpdateUser : handleAddUser} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-              <input
-                type="text"
-                value={newUser.name}
-                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
-              />
+        <div 
+          className="flex justify-between items-center cursor-pointer mb-4"
+          onClick={() => setIsFormExpanded(!isFormExpanded)}
+        >
+          <h2 className="text-xl font-bold">{editUserId ? "Edit User" : "Add New User"}</h2>
+          <button className="text-gray-500 hover:text-gray-700">
+            {isFormExpanded ? "▼" : "▶"}
+          </button>
+        </div>
+        
+        {isFormExpanded && (
+          <form ref={formRef} onSubmit={editUserId ? handleUpdateUser : handleAddUser} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  required={!editUserId}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
+                >
+                  <option value="customer">Customer</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
-              />
-            </div>
+            <AddressForm
+              address={newUser.address}
+              updateAddress={(address) => setNewUser({ ...newUser, address })}
+              errors={formErrors}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                required={!editUserId}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-              <select
-                value={newUser.role}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-[#E2C269] focus:border-[#E2C269]"
-              >
-                <option value="customer">Customer</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-          </div>
-
-          <AddressForm
-            address={newUser.address}
-            updateAddress={(address) => setNewUser({ ...newUser, address })}
-            errors={formErrors}
-          />
-
-          <div className="flex justify-end space-x-2">
-            {editUserId && (
+            <div className="flex justify-end space-x-2">
+              {editUserId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditUserId(null)
+                    resetForm()
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-[#1B2930] rounded-md hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+              )}
               <button
-                type="button"
-                onClick={() => {
-                  setEditUserId(null)
-                  resetForm()
-                }}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                type="submit"
+                className="px-4 py-2 bg-[#18608C] text-white rounded-md hover:bg-[#18608C]/90"
               >
-                Cancel
+                {editUserId ? "Update User" : "Add User"}
               </button>
-            )}
-            <button
-              type="submit"
-              className="px-4 py-2 bg-[#E2C269] text-[#1B2930] rounded-md hover:bg-[#E2C269]/90"
-            >
-              {editUserId ? "Update User" : "Add User"}
-            </button>
-          </div>
-        </form>
+            </div>
+          </form>
+        )}
       </div>
 
       {/* User List */}
@@ -514,7 +526,7 @@ const UsersPage = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleEditUser(user)}
-                          className="text-[#E2C269] hover:text-[#E2C269]/80"
+                          className="text-blue-600 hover:text-blue-800"
                         >
                           <FiEdit className="h-5 w-5" />
                         </button>

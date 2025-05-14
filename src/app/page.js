@@ -31,7 +31,7 @@ export default function Home() {
             TO TECH EXCELLENCE...
           </h1>
           <Link
-            href={user ? "/what-we-do" : "/register"}
+            href={user ? "/what-we-do/products" : "/register"}
             className="inline-block bg-[#18608C] text-white py-3 px-12 rounded-md font-semibold hover:bg-[#17A0BF] transition duration-300 text-lg mt-2"
           >
             Get Started

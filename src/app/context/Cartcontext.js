@@ -77,50 +77,68 @@ export function CartProvider({ children }) {
       return false
     }
     try {
+      // Fetch product details to get the stock
+      const productResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`,
+        { withCredentials: true }
+      );
+      const product = productResponse.data;
+      const stock = product.stock || 0;
+
+      // Find if the item already exists in the cart
+      const existingItem = cartItems.find((item) => item.product_id === productId);
+      const existingQuantity = existingItem ? existingItem.quantity : 0;
+      const newQuantity = Math.min(existingQuantity + quantity, stock);
+
+      if (existingItem && existingQuantity >= stock) {
+        // Already at max stock, do not add more
+        setIsCartOpen(true);
+        return false;
+      }
+
+      // Call backend to update/add cart item
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/cart`,
         {
           product_id: productId,
-          quantity,
+          quantity: newQuantity - existingQuantity, // Only add the difference
         },
         {
           withCredentials: true,
-        },
-      )
+        }
+      );
 
       if (response.data) {
-        const productResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/products/${productId}`,
-          { withCredentials: true }
-        )
-
         const newItem = {
           ...response.data,
-          Product: productResponse.data
-        }
+          Product: product,
+        };
 
-        setCartCount((prevCount) => prevCount + quantity)
-        const existingItem = cartItems.find((item) => item.product_id === productId)
-
+        setCartCount((prevCount) => prevCount + (newQuantity - existingQuantity));
         if (existingItem) {
-          setCartItems((prevItems) => attachProductsToCartItems(
-            prevItems.map((item) =>
-              item.product_id === productId
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            ),
-            products
-          ))
+          setCartItems((prevItems) =>
+            attachProductsToCartItems(
+              prevItems.map((item) =>
+                item.product_id === productId
+                  ? { ...item, quantity: newQuantity }
+                  : item
+              ),
+              products
+            )
+          );
         } else {
-          setCartItems((prevItems) => attachProductsToCartItems([...prevItems, newItem], products))
+          setCartItems((prevItems) =>
+            attachProductsToCartItems([...prevItems, newItem], products)
+          );
         }
-        setIsCartOpen(true)
+        await fetchCart(); // Ensure cart is up-to-date and deduplicated
+        setIsCartOpen(true);
       }
 
-      return true
+      return true;
     } catch (err) {
-      console.error("Error adding to cart:", err)
-      return false
+      console.error("Error adding to cart:", err);
+      return false;
     }
   }
 

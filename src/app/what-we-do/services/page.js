@@ -4,7 +4,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import Navbar from "@/app/Components/navbar"
-import Footer from "@/app/Components/footer"
 
 // Services data
 const services = [
@@ -216,8 +215,6 @@ export default function ServicesPage() {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   )
 }

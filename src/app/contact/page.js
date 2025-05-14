@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css"
 import Navbar from "@/app/Components/navbar"
 import Footer from "@/app/Components/footer"
 import { Send } from "lucide-react"
+import emailjs from "emailjs-com"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -56,16 +57,20 @@ export default function ContactPage() {
     }
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Send email via EmailJS
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          message: formData.message,
+        },
+        process.env.NEXT_PUBLIC_EMAILJS_USER_ID
+      )
 
-      // Success
       toast.success("Message sent successfully! We'll get back to you soon.")
-      setFormData({
-        name: "",
-        email: "",
-        message: "",
-      })
+      setFormData({ name: "", email: "", message: "" })
     } catch (error) {
       toast.error("Failed to send message. Please try again.")
       console.error("Error sending message:", error)

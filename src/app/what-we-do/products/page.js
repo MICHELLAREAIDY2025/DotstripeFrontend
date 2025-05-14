@@ -9,7 +9,6 @@ import { useCart } from "@/app/context/Cartcontext"
 import { useAuth } from "@/app/context/AuthContext"
 import { motion } from "framer-motion"
 import Navbar from "@/app/Components/navbar"
-import Footer from "@/app/Components/footer"
 import { ShoppingCart, Info, Plus, Minus } from "lucide-react"
 import { toast } from "react-toastify"
 
@@ -26,6 +25,7 @@ export default function ProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [modalMode, setModalMode] = useState("info") // 'info' or 'cart'
+  const [isAdding, setIsAdding] = useState(false)
   const productsPerPage = 9
 
   useEffect(() => {
@@ -153,7 +153,6 @@ export default function ProductsPage() {
         <main className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#18608C]"></div>
         </main>
-        <Footer />
       </div>
     )
   }
@@ -168,7 +167,6 @@ export default function ProductsPage() {
             <p className="text-white">{error}</p>
           </div>
         </main>
-        <Footer />
       </div>
     )
   }
@@ -247,10 +245,10 @@ export default function ProductsPage() {
             className="flex gap-8 mb-12 overflow-x-auto scrollbar-thin scrollbar-thumb-[#18608C] scrollbar-track-[#031626] px-2"
             style={{ WebkitOverflowScrolling: "touch" }}
             onWheel={(e) => {
-              if (e.deltaY !== 0) {
-                e.currentTarget.scrollLeft += e.deltaY
-                e.preventDefault()
-              }
+              e.preventDefault();
+              const container = e.currentTarget;
+              const scrollAmount = e.deltaY;
+              container.scrollLeft += scrollAmount;
             }}
           >
             {currentProducts?.map((product) => (
@@ -364,19 +362,44 @@ export default function ProductsPage() {
                             </button>
                             <span className="w-8 text-center font-medium">{quantity}</span>
                             <button
-                              onClick={() => setQuantity((prev) => prev + 1)}
+                              onClick={() => setQuantity((prev) => Math.min(selectedProduct.stock, prev + 1))}
                               className="p-2 text-gray-600 hover:text-gray-800 transition-colors"
+                              disabled={quantity >= selectedProduct.stock}
                             >
                               <Plus size={16} />
                             </button>
                           </div>
                           <button
-                            onClick={() => handleAddToCart(selectedProduct, quantity)}
-                            className="bg-[#18608C] text-white px-4 py-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300 flex items-center gap-2"
+                            onClick={async () => {
+                              if (isAdding) return;
+                              setIsAdding(true);
+                              const success = await addToCart(selectedProduct.id, quantity);
+                              setIsAdding(false);
+                              if (success) {
+                                toast.success("Added to cart!");
+                                setQuantity(1);
+                                setSelectedProduct(null);
+                                setModalMode("info");
+                                toggleCart();
+                              } else {
+                                toast.error("Could not add to cart. Please try again.");
+                              }
+                            }}
+                            disabled={isAdding || quantity > selectedProduct.stock}
+                            className="bg-[#18608C] text-white px-4 py-2 rounded hover:bg-[#17A0BF] transition relative"
                           >
-                            <ShoppingCart size={20} />
-                            Add to Cart
+                            {isAdding ? (
+                              <span className="animate-spin h-5 w-5 border-t-2 border-b-2 border-white inline-block"></span>
+                            ) : (
+                              <>
+                                <ShoppingCart className="inline-block mr-2" />
+                                Add to Cart
+                              </>
+                            )}
                           </button>
+                          {quantity >= selectedProduct.stock && (
+                            <span className="text-xs text-red-500 ml-2">No more stock available</span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -399,8 +422,6 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   )
 }

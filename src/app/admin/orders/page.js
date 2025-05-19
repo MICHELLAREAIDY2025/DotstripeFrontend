@@ -12,7 +12,7 @@ import Link from "next/link"
 import emailjs from '@emailjs/browser'
 
 // Initialize EmailJS
-emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_USER_ID)
 
 const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([])
@@ -60,11 +60,20 @@ const AdminOrdersPage = () => {
     }
   }
 
-  const sendOrderStatusEmail = async (order, newStatus) => {
+  const sendOrderStatusEmail = async (order, newStatus, user) => {
     try {
+      // Log the order object for debugging
+      console.log('Order object for email:', order);
+      // Use email from order.user, user, or fallback
+      const customerEmail = order.user?.email || user?.email;
+      if (!customerEmail) {
+        toast.error('Cannot send email: No customer email found for this order.');
+        return false;
+      }
+      // Make sure your EmailJS template uses {{to_email}} as the recipient variable
       const templateParams = {
-        to_name: order.user?.name || 'Customer',
-        to_email: order.user?.email,
+        to_name: order.user?.name || user?.name || 'Customer',
+        to_email: customerEmail, // This must match the variable in your EmailJS template
         order_id: order.id,
         status: newStatus,
         message: getStatusMessage(newStatus),
@@ -76,13 +85,14 @@ const AdminOrdersPage = () => {
       await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
         process.env.NEXT_PUBLIC_EMAILJS_ORDER_TEMPLATE,
-        templateParams
+        templateParams,
+        process.env.NEXT_PUBLIC_EMAILJS_USER_ID
       )
 
       return true
     } catch (error) {
-      console.error('Error sending email:', error)
-      return false
+      console.error('Error sending email:', error, error?.text, error?.status, error?.response)
+      return false;
     }
   }
 
@@ -133,9 +143,14 @@ const AdminOrdersPage = () => {
               // Then send the email notification if status is not pending
               let emailSent = false
               if (newStatus !== 'pending') {
-                const order = orders.find(o => o.id === orderId)
-                if (order) {
-                  emailSent = await sendOrderStatusEmail(order, newStatus)
+                const orderObj = orders.find(o => o.id === orderId)
+                if (orderObj) {
+                  // Try to get user from order details page state if available
+                  let user = null;
+                  if (window && window.__ORDER_DETAILS_USER__) {
+                    user = window.__ORDER_DETAILS_USER__;
+                  }
+                  emailSent = await sendOrderStatusEmail(orderObj, newStatus, user)
                 }
               }
               
@@ -220,12 +235,27 @@ const AdminOrdersPage = () => {
   }
 
   const handleDelete = (orderId) => {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) {
+      toast.error('Order not found.');
+      return;
+    }
+    // Only allow deletion for 'pending' orders
+    if (order.status !== 'pending') {
+      toast.error('Only orders with status "pending" can be deleted.');
+      return;
+    }
     confirmAlert({
       title: "Confirm Delete",
-      message: `Are you sure you want to delete order #${orderId}?`,
+      message: (
+        <div className="text-lg font-medium text-gray-700">
+          Are you sure you want to delete order #{orderId}? This action cannot be undone.
+        </div>
+      ),
       buttons: [
         {
           label: "Yes",
+          className: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md",
           onClick: async () => {
             try {
               await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/${orderId}`, {
@@ -244,8 +274,33 @@ const AdminOrdersPage = () => {
         },
         {
           label: "No",
+          className: "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md",
+          onClick: () => {},
         },
       ],
+      overlayClassName: "bg-black bg-opacity-50",
+      customUI: ({ onClose, title, message, buttons }) => {
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
+            <div className="mb-6">{message}</div>
+            <div className="flex justify-end space-x-4">
+              {buttons.map((button, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    button.onClick()
+                    onClose()
+                  }}
+                  className={button.className}
+                >
+                  {button.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      }
     })
   }
 

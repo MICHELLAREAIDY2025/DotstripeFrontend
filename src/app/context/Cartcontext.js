@@ -101,7 +101,7 @@ export function CartProvider({ children }) {
         `${process.env.NEXT_PUBLIC_API_URL}/api/cart`,
         {
           product_id: productId,
-          quantity: newQuantity - existingQuantity, // Only add the difference
+          quantity: quantity, // Send the actual quantity to add
         },
         {
           withCredentials: true,
@@ -109,29 +109,8 @@ export function CartProvider({ children }) {
       );
 
       if (response.data) {
-        const newItem = {
-          ...response.data,
-          Product: product,
-        };
-
-        setCartCount((prevCount) => prevCount + (newQuantity - existingQuantity));
-        if (existingItem) {
-          setCartItems((prevItems) =>
-            attachProductsToCartItems(
-              prevItems.map((item) =>
-                item.product_id === productId
-                  ? { ...item, quantity: newQuantity }
-                  : item
-              ),
-              products
-            )
-          );
-        } else {
-          setCartItems((prevItems) =>
-            attachProductsToCartItems([...prevItems, newItem], products)
-          );
-        }
-        await fetchCart(); // Ensure cart is up-to-date and deduplicated
+        // Refresh the entire cart to ensure consistency
+        await fetchCart();
         setIsCartOpen(true);
       }
 

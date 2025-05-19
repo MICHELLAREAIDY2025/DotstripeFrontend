@@ -34,8 +34,19 @@ export default function Checkout() {
   })
 
   const updateState = (newState) => setState((prev) => ({ ...prev, ...newState }))
-  const updateAddress = (newAddress) => updateState({ address: { ...state.address, ...newAddress } })
-  const updatePayment = (newPayment) => updateState({ payment: { ...state.payment, ...newPayment } })
+
+  // Load address from localStorage on mount (before backend fetch)
+  useEffect(() => {
+    const savedAddress = localStorage.getItem('savedAddress')
+    if (savedAddress) {
+      try {
+        const parsedAddress = JSON.parse(savedAddress)
+        setState((prev) => ({ ...prev, address: { ...prev.address, ...parsedAddress } }))
+      } catch (error) {
+        console.error('Error parsing saved address:', error)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (!user) {
@@ -49,7 +60,14 @@ export default function Checkout() {
         if (isCartEmpty) {
           return updateState({ isLoading: false, isCartEmpty: true })
         }
-
+        // If userAddress is present, update localStorage
+        if (userAddress && Object.keys(userAddress).length > 0) {
+          try {
+            localStorage.setItem('savedAddress', JSON.stringify(userAddress))
+          } catch (error) {
+            console.error('Error saving userAddress to localStorage:', error)
+          }
+        }
         updateState({
           cartItems: cartWithDetails,
           address: {
@@ -91,6 +109,25 @@ export default function Checkout() {
   if (state.isLoading) return <LoadingState />
   if (state.isCartEmpty) return <EmptyCartState />
   if (state.orderPlaced) return <OrderConfirmation orderId={state.orderId} />
+
+  const updateAddress = (newAddress) => {
+    setState((prev) => {
+      const updated = { ...prev, address: { ...prev.address, ...newAddress } }
+      try {
+        localStorage.setItem('savedAddress', JSON.stringify(updated.address))
+      } catch (error) {
+        console.error('Error saving address to localStorage:', error)
+      }
+      return updated
+    })
+  }
+
+  const updatePayment = (newPayment) => {
+    setState((prev) => ({
+      ...prev,
+      payment: { ...prev.payment, ...newPayment }
+    }))
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

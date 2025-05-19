@@ -67,10 +67,12 @@ export default function AdminOrderDetailsPage() {
             <p><span className="font-semibold">Total Amount:</span> ${parseFloat(order.total_amount).toFixed(2)}</p>
           </div>
           <div>
-            <p className="font-semibold mb-1">Customer Info:</p>
-            <p>Name: {order.user?.name || user?.name || order.user_name || "-"}</p>
-            <p>Email: {order.user?.email || user?.email || order.user_email || "-"}</p>
-            <p>User ID: {order.user_id || order.user?.id || user?.id || "-"}</p>
+            <h2 className="font-semibold mb-1">Customer Info</h2>
+            <div className="text-gray-700 text-sm space-y-1">
+              <div><span className="font-semibold">Name:</span> {order.user?.name || user?.name || order.user_name || "-"}</div>
+              <div><span className="font-semibold">Email:</span> {order.user?.email || user?.email || order.user_email || "-"}</div>
+              <div><span className="font-semibold">User ID:</span> {order.user_id || order.user?.id || user?.id || "-"}</div>
+            </div>
           </div>
         </div>
         <div className="mb-6">
@@ -88,7 +90,7 @@ export default function AdminOrderDetailsPage() {
           )}
         </div>
         <div>
-          <h2 className="font-semibold mb-2">Order Items</h2>
+          <h2 className="font-semibold mb-2">Ordered Items</h2>
           {order.items && order.items.length > 0 ? (
             <table className="w-full border text-sm mb-4">
               <thead>

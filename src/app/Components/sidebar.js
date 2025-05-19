@@ -38,11 +38,6 @@ const Sidebar = () => {
       icon: <Users size={20} />,
       path: "/admin/users",
     },
-    {
-      title: "Settings",
-      icon: <Settings size={20} />,
-      path: "/admin/settings",
-    },
   ]
 
   const isActive = (path) => {

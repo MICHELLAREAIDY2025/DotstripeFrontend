@@ -17,7 +17,7 @@ export default function EmptyCartState() {
         <p className="text-gray-600 mb-8">Add some products to your cart and come back to checkout.</p>
         
         <button
-          onClick={() => router.push("/products")}
+          onClick={() => router.push("/what-we-do/products")}
           className="w-full bg-[#18608C] text-white py-3 px-4 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
         >
           Continue Shopping

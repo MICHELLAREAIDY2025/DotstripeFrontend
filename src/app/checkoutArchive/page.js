@@ -346,7 +346,7 @@ function CheckoutContent() {
                 We'll send you an email with your order details shortly.
               </p>
               <button
-                onClick={() => router.push("/products")}
+                onClick={() => router.push("/what-we-do/products")}
                 className="bg-[#18608C] text-white px-6 py-3 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
               >
                 Continue Shopping

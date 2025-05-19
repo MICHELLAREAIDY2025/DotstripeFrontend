@@ -35,7 +35,7 @@ export default function OrderConfirmation({ orderId }) {
             View Order History
           </button>
           <button
-            onClick={() => router.push("/products")}
+            onClick={() => router.push("/what-we-do/products")}
             className="w-full bg-white text-[#18608C] border border-[#18608C] py-3 px-4 rounded-md hover:bg-[#18608C] hover:text-white transition-colors duration-300"
           >
             Continue Shopping

@@ -4,6 +4,8 @@ import { createContext, useContext, useState, useEffect } from "react"
 import axios from "axios"
 import { useAuth } from "@/app/context/AuthContext";
 import { useProducts } from "@/app/context/ProductContext"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
 
 const CartContext = createContext()
 
@@ -21,6 +23,7 @@ export function CartProvider({ children }) {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const { user, loading: authLoading } = useAuth()
   const { products } = useProducts()
+  const router = useRouter()
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen)
@@ -73,7 +76,8 @@ export function CartProvider({ children }) {
 
   const addToCart = async (productId, quantity = 1) => {
     if (!user) {
-      console.error("User must be logged in to add items to cart")
+      toast.info("Please login to add items to cart")
+      router.push("/login")
       return false
     }
     try {

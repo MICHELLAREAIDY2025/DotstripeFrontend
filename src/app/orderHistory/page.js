@@ -118,7 +118,7 @@ const OrdersHistory = () => {
           <div className="bg-white bg-opacity-10 rounded-lg p-8 text-center">
             <p className="text-xl mb-4">You haven't placed any orders yet</p>
             <button
-              onClick={() => router.push("/products")}
+              onClick={() => router.push("/what-we-do/products")}
               className="bg-[#18608C] text-white px-6 py-3 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
             >
               Start Shopping

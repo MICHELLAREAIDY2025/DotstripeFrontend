@@ -14,7 +14,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 lg:gap-8 items-center">
           {/* Contact Section */}
           <div className="flex flex-col items-center md:items-start space-y-1">
-            <h3 className="text-lg font-medium mb-2 text-white">Contact</h3>
+            <Link href="/contact" className="text-lg font-medium mb-2 text-white hover:text-[#17A0BF] transition-colors duration-200">
+              Contact
+            </Link>
             <a
               href="mailto:Info@Dot-Stripe.Com"
               className="text-gray-300 hover:text-white transition-colors duration-200 text-base"
@@ -32,8 +34,7 @@ const Footer = () => {
           <div className="flex flex-col items-center md:items-end space-y-0.5">
             <h3 className="text-lg font-medium mb-2 text-white">Location</h3>
             <p className="text-gray-300 md:text-right text-base">Beirut, Lebanon</p>
-            <p className="text-gray-300 md:text-right text-base">75008 Paris</p>
-            <p className="text-gray-300 md:text-right text-base">FRANCE</p>
+            <p className="text-gray-300 md:text-right text-base">Paris, France</p>
           </div>
         </div>
       </div>

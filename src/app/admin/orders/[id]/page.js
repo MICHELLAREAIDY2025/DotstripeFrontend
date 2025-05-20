@@ -69,9 +69,9 @@ export default function AdminOrderDetailsPage() {
           <div>
             <h2 className="font-semibold mb-1">Customer Info</h2>
             <div className="text-gray-700 text-sm space-y-1">
-              <div><span className="font-semibold">Name:</span> {order.user?.name || user?.name || order.user_name || "-"}</div>
-              <div><span className="font-semibold">Email:</span> {order.user?.email || user?.email || order.user_email || "-"}</div>
-              <div><span className="font-semibold">User ID:</span> {order.user_id || order.user?.id || user?.id || "-"}</div>
+              <div><span className="font-semibold">Name:</span> {order.User?.name || user?.name || order.user_name || "-"}</div>
+              <div><span className="font-semibold">Email:</span> {order.User?.email || user?.email || order.user_email || "-"}</div>
+              <div><span className="font-semibold">User ID:</span> {order.user_id || order.User?.id || user?.id || "-"}</div>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function AdminOrderDetailsPage() {
         </div>
         <div>
           <h2 className="font-semibold mb-2">Ordered Items</h2>
-          {order.items && order.items.length > 0 ? (
+          {order.OrderItems && order.OrderItems.length > 0 ? (
             <table className="w-full border text-sm mb-4">
               <thead>
                 <tr className="bg-gray-100">
@@ -102,7 +102,7 @@ export default function AdminOrderDetailsPage() {
                 </tr>
               </thead>
               <tbody>
-                {order.items.map((item, idx) => (
+                {order.OrderItems.map((item, idx) => (
                   <tr key={item.id || idx}>
                     <td className="p-2 border">{item.Product?.name || item.name || "-"}</td>
                     <td className="p-2 border text-center">{item.quantity}</td>

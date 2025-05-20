@@ -56,17 +56,25 @@ const Sidebar = () => {
       {/* Logo */}
       <div className="flex items-center justify-center py-6 border-b border-[#0E4459]">
         {collapsed ? (
-          <div className="relative h-10 w-10">
-            <Image src="/images/DotStripeLogo.png" alt="Dot Stripe" width={40} height={40} className="object-contain" />
+          <div className="relative h-12 w-12">
+            <Image 
+              src="/images/DotStripeLogo.png" 
+              alt="Dot Stripe" 
+              width={48} 
+              height={48} 
+              className="object-contain" 
+              priority
+            />
           </div>
         ) : (
-          <div className="relative h-12 w-32">
+          <div className="relative h-16 w-40">
             <Image
               src="/images/DotStripeLogo.png"
               alt="Dot Stripe"
-              width={140}
-              height={60}
+              width={160}
+              height={64}
               className="object-contain"
+              priority
             />
           </div>
         )}

@@ -95,35 +95,35 @@ export default function ProductsPage() {
         <h3 className="text-xl font-semibold text-gray-800 mb-4">{product.name}</h3>
         <div className="flex justify-between items-center mb-4">
           <span className="text-[#18608C] font-bold text-xl">${product.price}</span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setSelectedProduct(product)
-                setModalMode("info")
-              }}
-              className="bg-gray-200 text-gray-700 p-2 rounded-md hover:bg-gray-300 transition-colors duration-300"
-              title="View Details"
-            >
-              <Info size={20} />
-            </button>
-            <button
-              onClick={() => {
-                setSelectedProduct(product)
-                setModalMode("cart")
-              }}
-              className="bg-[#18608C] text-white p-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
-              title="Add to Cart"
-            >
-              <ShoppingCart size={20} />
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              setSelectedProduct(product)
+              setModalMode("info")
+            }}
+            className="bg-gray-200 text-gray-700 p-2 rounded-md hover:bg-gray-300 transition-colors duration-300"
+            title="View Details"
+          >
+            <Info size={20} />
+          </button>
         </div>
-        <Link
-          href={`/contact?product=${encodeURIComponent(product.name)}`}
-          className="block w-full text-center bg-[#18608C] text-white px-4 py-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300"
-        >
-          Inquire
-        </Link>
+        <div className="space-y-2">
+          <button
+            onClick={() => {
+              setSelectedProduct(product)
+              setModalMode("cart")
+            }}
+            className="w-full bg-[#18608C] text-white px-4 py-2 rounded-md hover:bg-[#17A0BF] transition-colors duration-300 flex items-center justify-center gap-2"
+          >
+            <ShoppingCart size={20} />
+            Add to Cart
+          </button>
+          <Link
+            href={`/contact?product=${encodeURIComponent(product.name)}`}
+            className="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-300 flex items-center justify-center"
+          >
+            Inquire
+          </Link>
+        </div>
       </div>
     </motion.div>
   )

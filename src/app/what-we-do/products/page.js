@@ -74,7 +74,7 @@ export default function ProductsPage() {
       setModalMode("info")
       toggleCart() // open cart popup
     } catch (error) {
-      toast.error("Failed to add product to cart")
+      console.error("Failed to add product to cart:", error)
     }
   }
 

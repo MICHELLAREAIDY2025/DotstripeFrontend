@@ -381,8 +381,6 @@ export default function ProductsPage() {
                                 setSelectedProduct(null);
                                 setModalMode("info");
                                 toggleCart();
-                              } else {
-                                toast.error("Could not add to cart. Please try again.");
                               }
                             }}
                             disabled={isAdding || quantity > selectedProduct.stock}

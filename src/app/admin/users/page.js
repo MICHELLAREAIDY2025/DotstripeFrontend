@@ -200,13 +200,14 @@ const UsersPage = () => {
     confirmAlert({
       title: "Confirm Delete",
       message: (
-        <div>
-          Are you sure you want to delete user <strong>"{userName}"</strong>?
+        <div className="text-lg font-medium text-gray-700">
+          Are you sure you want to delete user "{userName}"? This action cannot be undone.
         </div>
       ),
       buttons: [
         {
           label: "Yes",
+          className: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md",
           onClick: async () => {
             try {
               const token = localStorage.getItem("token")
@@ -227,8 +228,33 @@ const UsersPage = () => {
         },
         {
           label: "No",
+          className: "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md",
+          onClick: () => {},
         },
       ],
+      overlayClassName: "bg-black bg-opacity-50",
+      customUI: ({ onClose, title, message, buttons }) => {
+        return (
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md mx-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>
+            <div className="mb-6">{message}</div>
+            <div className="flex justify-end space-x-4">
+              {buttons.map((button, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    button.onClick()
+                    onClose()
+                  }}
+                  className={button.className}
+                >
+                  {button.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      }
     })
   }
 
